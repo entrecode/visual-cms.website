@@ -60,11 +60,11 @@ function setupExpress(config) {
   app.use(cookieParser());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));
-  /*
-   app.use(express.static(path.resolve(__dirname, '../static'), {
+
+   app.use(express.static(path.resolve(config.basedir, './static'), {
    maxAge: '1 day',
    }));
-   */
+
   app.use((req, res, next) => {
     next();
   });
