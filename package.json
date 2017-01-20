@@ -1,0 +1,32 @@
+{
+  "name": "visual-cms.website",
+  "version": "0.1.0",
+  "description": "Visual CMS Website Library. By entrecode.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/entrecode/visual-cms.website"
+  },
+  "author": "entrecode GmbH",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "cache-manager": "^2.4.0",
+    "config": "^1.24.0",
+    "cookie-parser": "^1.4.3",
+    "ec.datamanager": "^0.11.2",
+    "express": "^4.14.0",
+    "express-promise-router": "^1.1.1",
+    "js-yaml": "^3.7.0",
+    "moment-timezone": "^0.5.11",
+    "nunjucks": "^3.0.0",
+    "require-all": "^2.1.0",
+    "speakingurl": "^11.0.0",
+    "visual-cms.core": "^0.1.0",
+    "xss": "^0.3.3"
+  }
+}
