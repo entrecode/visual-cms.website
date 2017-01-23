@@ -1,6 +1,6 @@
 const Datamanager = require('ec.datamanager');
 const cacheManager = require('cache-manager');
-
+const nunjucks = require('nunjucks');
 
 function setupDatamanager(config) {
 
@@ -139,6 +139,47 @@ function setupDatamanager(config) {
     });
   }
 
+  const TemplateLoader = nunjucks.Loader.extend({
+    init() {
+      // setup a process which watches templates here
+      // and call `this.emit('update', name)` when a template
+      // is changed
+    },
+    async: true,
+    getSource(name, callback) {
+      return Promise.resolve(name)
+      .then(name => name.split('-'))
+      .then((nameParts) => {
+        if (nameParts.length < 2) {
+          throw new Error(`invalid template name '${name}': should be of the form xxx-entryID`);
+        }
+        let [templateType, ...entryID] = nameParts;
+        entryID = entryID.join('-');
+        if (!config.dynamicTemplates || !config.dynamicTemplates[templateType]) {
+          throw new Error(`dynamic templates '${templateType}' not defined`)
+        }
+        return loadFromDataManagerOrCache(config.dynamicTemplates[templateType].model, 'entry', entryID)
+        .then(entry => entry.value)
+        .then(template => ({
+          path: name,
+          src: `
+        <style>${template.style}</style>
+        ${template.content}
+      `,
+          noCache: config.disableTemplateCache,
+        }))
+        .catch(error => {
+          if (error.status = 404) {
+            throw new Error(`template with id ${entryID} not found.`)
+          }
+          throw error;
+        });
+      })
+      .then((result) => callback(null, result))
+      .catch(callback);
+    }
+  });
+
   return {
     load(toLoad) {
       const results = {};
@@ -150,13 +191,13 @@ function setupDatamanager(config) {
       }))
       .then(() => results);
     },
-
+    loadFromDataManagerOrCache,
     filterEntry,
     filterFile,
     filterImage,
     filterImageThumb,
     filterLinkedEntryTitle,
-
+    TemplateLoader,
   };
 }
 

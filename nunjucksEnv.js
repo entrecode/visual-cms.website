@@ -2,21 +2,21 @@ const nunjucks = require('nunjucks');
 const moment = require('moment-timezone');
 const speakingurl = require('speakingurl');
 const requireAll = require('require-all');
+const fs = require('fs');
 const path = require('path');
 const vcms = require('visual-cms.core');
 const xss = require('xss');
-const config = require('config');
 
-const xssWhitelist = {};
+const xssWhitelist = {}; // allow style and class attributes on all tags
 Object.keys(xss.whiteList).forEach((tagName) => {
   xssWhitelist[tagName] = xss.whiteList[tagName].concat(['style', 'class']);
 });
-//const extensions = requireAll(path.resolve(__dirname, '../extensions'));
 
 function setupNunjucksEnv(config, datamanager) {
 
   const nunjucksEnv = new nunjucks.Environment([
     new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
+    new datamanager.TemplateLoader(),
   ]);
 
   nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
@@ -31,12 +31,20 @@ function setupNunjucksEnv(config, datamanager) {
   nunjucksEnv.addFilter('speakingurl', (input, options = { lang: config.locale }) => speakingurl(input, options));
   nunjucksEnv.addFilter('xss', input => xss(input, { whiteList: xssWhitelist }));
   nunjucksEnv.addFilter('vcms', vcms.toDOM);
-  /*
-   Object.keys(extensions)
-   .map(key => extensions[key])
-   .filter(extension => extension && 'name' in extension && 'ExtensionClass' in extension)
-   .forEach(extension => nunjucksEnv.addExtension(extension.name, new extension.ExtensionClass()));
-   */
-return nunjucksEnv;
+
+  const extensionsPath = path.resolve(config.basedir, './extensions');
+  try {
+    fs.accessSync(extensionsPath, fs.constants.R_OK);
+    const extensions = requireAll(extensionsPath);
+    Object.keys(extensions)
+    .map(key => extensions[key](nunjucks))
+    .filter(extension => extension && 'name' in extension && 'ExtensionClass' in extension)
+    .forEach(extension => nunjucksEnv.addExtension(extension.name, new extension.ExtensionClass()));
+  } catch (extensionsDirDoesNotExistError) {
+    console.error(extensionsDirDoesNotExistError.message);
+    // do nothing. If no extensions directory is there, we don't load any. Simple as that.
+  }
+
+  return nunjucksEnv;
 }
 module.exports = setupNunjucksEnv;
