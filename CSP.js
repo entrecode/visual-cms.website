@@ -98,7 +98,7 @@ class CSP {
     if (!Array.isArray(newValue)) {
       throw new Error('could not set CSP property, expected Array');
     }
-    this[styleSymbol] = newValue;
+    this[fontSymbol] = newValue;
   }
 
   get 'connect-src'() {
