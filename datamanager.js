@@ -148,7 +148,7 @@ function setupDatamanager(config) {
     async: true,
     getSource(name, callback) {
       return Promise.resolve(name)
-      .then(name => name.split('-'))
+      .then(n => n.split('-'))
       .then((nameParts) => {
         if (nameParts.length < 2) {
           throw new Error(`invalid template name '${name}': should be of the form xxx-entryID`);
@@ -169,15 +169,15 @@ function setupDatamanager(config) {
           noCache: config.disableTemplateCache,
         }))
         .catch(error => {
-          if (error.status = 404) {
-            throw new Error(`template with id ${entryID} not found.`)
+          if (error.status === 404) {
+            throw new Error(`template with id ${entryID} not found.`);
           }
           throw error;
         });
       })
       .then((result) => callback(null, result))
       .catch(callback);
-    }
+    },
   });
 
   return {
