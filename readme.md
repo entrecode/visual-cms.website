@@ -104,7 +104,7 @@ By default, the express app uses a
 It allows common stuff, but e.g. disallows loading JavaScript from other servers. If you want that,
 you have to add the hostnames to the CSP. The returned `csp` object has the following constants
 defined: `csp.NONE`, `csp.UNSAFEINLINE`, `csp.SELF`.
-You can set `csp.script-src` and `csp.style-src` to Arrays of other values, like this:
+You can set `csp.script-src`, `csp.style-src` and `csp.font-src` to Arrays of other values, like this:
 ```js
 csp['script-src'] = [
   csp.SELF,

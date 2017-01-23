@@ -94,6 +94,13 @@ class CSP {
     return this[fontSymbol];
   }
 
+  set 'font-src'(newValue) {
+    if (!Array.isArray(newValue)) {
+      throw new Error('could not set CSP property, expected Array');
+    }
+    this[styleSymbol] = newValue;
+  }
+
   get 'connect-src'() {
     return this[connectSymbol];
   }
