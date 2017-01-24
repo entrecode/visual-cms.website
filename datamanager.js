@@ -198,6 +198,7 @@ function setupDatamanager(config) {
     filterImageThumb,
     filterLinkedEntryTitle,
     TemplateLoader,
+    datamanager,
   };
 }
 

@@ -104,7 +104,7 @@ By default, the express app uses a
 It allows common stuff, but e.g. disallows loading JavaScript from other servers. If you want that,
 you have to add the hostnames to the CSP. The returned `csp` object has the following constants
 defined: `csp.NONE`, `csp.UNSAFEINLINE`, `csp.SELF`.
-You can set `csp.script-src`, `csp.style-src` and `csp.font-src` to Arrays of other values, like this:
+You can set `csp.script-src`, `csp.style-src`, `csp.font-src` and `csp.connect-src` to Arrays of other values, like this:
 ```js
 csp['script-src'] = [
   csp.SELF,
@@ -127,8 +127,10 @@ The function returns the single entry if `entryID` is given, or *always* an Arra
 The properties are directly inside the returned entries (no `value` property as in the SDK). 
 Note that the date you try to load needs to be publicly available (i.e. needs a public get policy).
 
-There is also da Nunjucks Template loader that allows laoding templates from Data Manager.
+There is also da Nunjucks Template loader that allows loading templates from Data Manager.
 
+`datamanager.datamanager` is the actual SDK instance, but should only be used for writing data, not for reading.
+ 
 ### `nunjucksEnv` export
 Your [Nunjucks Environment](https://mozilla.github.io/nunjucks/api.html#environment).
 

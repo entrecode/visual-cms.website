@@ -105,6 +105,13 @@ class CSP {
     return this[connectSymbol];
   }
 
+  set 'connect-src'(newValue) {
+    if (!Array.isArray(newValue)) {
+      throw new Error('could not set CSP property, expected Array');
+    }
+    this[connectSymbol] = newValue;
+  }
+
   middleware(req, res, next) {
     const contentSecurityPolicy = [
       'default-src',
