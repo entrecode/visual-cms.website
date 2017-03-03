@@ -14,10 +14,12 @@ Features:
 - Content Security Policies
 
 ## Usage
+> Note: All visual-cms.websites need a name in the form `mywebsite.dynamic-website`. Automatic deployment relies on this.
 
 This module requires Node.js ≥ 6.0.0. It uses ES2016 features.
 
 Minimal example:
+
 ```js
 const { router, express } = require('visual-cms.website')('mywebsite', __dirname);
 
@@ -36,7 +38,7 @@ if (module.parent) {
 This file will run a development server when started with node. It also exports an express app that
 can be used in another module, or in *ec.render.*
 
-It is recommended to add a `/config/default.yml` config file
+It is recommended to add a `/config/local.yml` config file
 (visual-cms.website uses [node config](https://www.npmjs.com/package/config) internally) and to 
 specify the file with the above code as "main" in your `package.json`.
 
@@ -67,9 +69,9 @@ as first parameter again in another sub-library of your project, you'll get the 
 it possible to e.g. reuse the Nunjucks Environment and your router object.
 
 ### `config` export
-The module exports a config JSON object. It is by default rendered from `/config/default.yml`.
-However, if your module is mounted in ec.render, the configuration will be overwritten with the 
-production config defined in ec.render.
+The module exports a config JSON object. It is by default rendered from `/config/default.yml` and `/config/local.yml`.
+If your module is mounted in ec.render, ec.render will copy all contents from all files in
+`/config/*.yml` (skipping `/config/local.yml`) into its own config. You can specify config for `production.yml`, `development.yml`, `stage.yml`, `staging.yml`, and `testing.yml`.
 
 #### Example `default.yml` config file:
 ```yaml
