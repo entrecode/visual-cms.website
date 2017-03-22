@@ -4,7 +4,7 @@ const libDatamanager = require('./datamanager');
 const libExpress = require('./express');
 const libNunjucksEnv = require('./nunjucksEnv');
 const CSP = require('./CSP');
-
+const cache = require('./cache');
 const instances = new Map();
 
 module.exports = function(projectName, basedir) {
@@ -31,6 +31,7 @@ module.exports = function(projectName, basedir) {
     csp,
     datamanager,
     nunjucksEnv,
+    cache,
   };
 
   instances.set(projectName, instance);
