@@ -12,6 +12,7 @@ Features:
 - Common filters (for date formatting, speaking URLs, ...)
 - Promise-based [Express Router](https://www.npmjs.com/package/express-promise-router)
 - Content Security Policies
+- Cache-Control headers
 
 ## Usage
 > Note: All visual-cms.websites need a name in the form `mywebsite.dynamic-website`. Automatic deployment relies on this.
@@ -54,6 +55,7 @@ const {
   csp,
   datamanager,
   nunjucksEnv,
+  cache,
 } = require('visual-cms.website')('mywebsite', __dirname);
 ```
 
@@ -115,6 +117,21 @@ csp['script-src'] = [
 ]
 ```
 This would allow scripts from static files, from *.entrecode.de and from *.googleapis.com.
+
+### `cache` export
+By default, no Cache-Control headers are set, because it is assumed that some load balancer / proxy
+does that (e.g. Amazon CloudFront). You can, however use the `cache` export to set a custom `Cache Control`
+header.
+
+#### cache.middleware(maxAge, ...args)
+Always returns an express middleware.
+The argument `maxAge` is the maxAge that should be set on the response in seconds.
+You may specify additional properties. The three helpers `cache.NO_CACHE`, `cache.NO_STORE` and `cache.PRIVATE`
+are available for you to use. Example: `cache.middleware(60 * 60, cache.PRIVATE)` will result in 
+`Cache-Control: private, max-age=3600`.
+
+#### cache.set(res, maxAge, ...args)
+Same as the middleware, but not as middleware. Just give the response object to set the header to.
 
 ### `datamanager` export
 Some optimized methods to load data from [ec.datamanger](https://www.npmjs.com/package/ec.datamanager),
