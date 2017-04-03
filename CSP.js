@@ -82,6 +82,13 @@ class CSP {
     return this[imgSymbol];
   }
 
+  set 'img-src'(newValue) {
+    if (!Array.isArray(newValue)) {
+      throw new Error('could not set CSP property, expected Array');
+    }
+    this[imgSymbol] = newValue;
+  }
+
   get 'media-src'() {
     return this[mediaSymbol];
   }
