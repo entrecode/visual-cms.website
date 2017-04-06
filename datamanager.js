@@ -2,6 +2,8 @@ const Datamanager = require('ec.datamanager');
 const cacheManager = require('cache-manager');
 const nunjucks = require('nunjucks');
 
+let dmCache;
+
 function setupDatamanager(config) {
 
   const memoryCache = cacheManager.caching({
@@ -9,7 +11,7 @@ function setupDatamanager(config) {
     max: 100,
     ttl: config.memoryCacheTtl
   }); // generic
-  const entryCache = cacheManager.caching({
+  const leveledEntryCache = cacheManager.caching({
     store: 'memory',
     max: 100,
     ttl: config.memoryCacheTtl
@@ -26,7 +28,11 @@ function setupDatamanager(config) {
     if (requestType === 'entry') {
       return Promise.resolve(args)
       .then(([entryID, levels]) => {
-        return entryCache.wrap(`${modelName}-${entryID}-${levels || 0}`, () => {
+        if (dmCache && (!levels || levels === 0)) { // dmCache does not support leveled requests
+          return dmCache.getEntry(modelName, entryID)
+            .then(value => ({ value }));
+        }
+        return leveledEntryCache.wrap(`${modelName}-${entryID}-${levels || 0}`, () => {
           return datamanager.model(modelName).entry(entryID, levels);
         });
       });
@@ -139,11 +145,14 @@ function setupDatamanager(config) {
     });
   }
 
+  let templateLoaderEmitter;
+
   const TemplateLoader = nunjucks.Loader.extend({
     init() {
       // setup a process which watches templates here
       // and call `this.emit('update', name)` when a template
       // is changed
+      templateLoaderEmitter = this;
     },
     async: true,
     getSource(name, callback) {
@@ -180,6 +189,20 @@ function setupDatamanager(config) {
     },
   });
 
+  function useDMCache(dmCacheInstance) {
+    dmCache = dmCacheInstance;
+    dmCache.setDataManagerInstance(datamanager);
+    dmCache.eventEmitter.on('updatedCache', ({ type, model, entryID }) => {
+      const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
+      .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
+      .reduce((a, b) => Object.assign(a, b), {});
+      if (model in dynamicTemplateModels) {
+        console.log(`emitted nunjucks update ${dynamicTemplateModels[model]}-${entryID}`);
+        templateLoaderEmitter.emit('update', `${dynamicTemplateModels[model]}-${entryID}`);
+      }
+    });
+  }
+
   return {
     load(toLoad) {
       const results = {};
@@ -199,6 +222,7 @@ function setupDatamanager(config) {
     filterLinkedEntryTitle,
     TemplateLoader,
     datamanager,
+    useDMCache,
   };
 }
 
