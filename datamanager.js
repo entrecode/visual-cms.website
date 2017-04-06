@@ -152,7 +152,10 @@ function setupDatamanager(config) {
       // setup a process which watches templates here
       // and call `this.emit('update', name)` when a template
       // is changed
+        console.log('TemplateLoader init')
       if (dmCacheEventEmitter) {
+
+        console.log('dmCacheEventEmitter is set')
         const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
         .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
         .reduce((a, b) => Object.assign(a, b), {});
