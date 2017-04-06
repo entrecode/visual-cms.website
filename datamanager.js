@@ -145,27 +145,14 @@ function setupDatamanager(config) {
     });
   }
 
-  let dmCacheEventEmitter;
+  let templateLoaderEmitter;
 
   const TemplateLoader = nunjucks.Loader.extend({
     init() {
       // setup a process which watches templates here
       // and call `this.emit('update', name)` when a template
       // is changed
-        console.log('TemplateLoader init')
-      if (dmCacheEventEmitter) {
-
-        console.log('dmCacheEventEmitter is set')
-        const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
-        .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
-        .reduce((a, b) => Object.assign(a, b), {});
-        dmCacheEventEmitter.on('updatedCache', ({ type, model, entryID }) => {
-          if (model in dynamicTemplateModels) {
-            console.log(`emitted nunjucks update ${dynamicTemplateModels[model]}-${entryID}`);
-            this.emit('update', `${dynamicTemplateModels[model]}-${entryID}`);
-          }
-        });
-      }
+      templateLoaderEmitter = this;
     },
     async: true,
     getSource(name, callback) {
@@ -205,7 +192,15 @@ function setupDatamanager(config) {
   function useDMCache(dmCacheInstance) {
     dmCache = dmCacheInstance;
     dmCache.setDataManagerInstance(datamanager);
-    dmCacheEventEmitter = dmCache.eventEmitter;
+    dmCache.eventEmitter.on('updatedCache', ({ type, model, entryID }) => {
+      const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
+      .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
+      .reduce((a, b) => Object.assign(a, b), {});
+      if (model in dynamicTemplateModels) {
+        console.log(`emitted nunjucks update ${dynamicTemplateModels[model]}-${entryID}`);
+        templateLoaderEmitter.emit('update', `${dynamicTemplateModels[model]}-${entryID}`);
+      }
+    });
   }
 
   return {
