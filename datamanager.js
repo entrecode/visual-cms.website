@@ -29,7 +29,8 @@ function setupDatamanager(config) {
       return Promise.resolve(args)
       .then(([entryID, levels]) => {
         if (dmCache && (!levels || levels === 0)) { // dmCache does not support leveled requests
-          return dmCache.getEntry(modelName, entryID);
+          return dmCache.getEntry(modelName, entryID)
+            .then(value => ({ value }));
         }
         return leveledEntryCache.wrap(`${modelName}-${entryID}-${levels || 0}`, () => {
           return datamanager.model(modelName).entry(entryID, levels);
