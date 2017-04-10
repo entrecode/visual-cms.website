@@ -53,6 +53,10 @@ function setupDatamanager(config) {
     if (!assetID) {
       return callback();
     }
+    if (!(typeof assetID === 'string')) {
+      console.error(`FileURL in visual-cms.website filterFile is invalid: ${assetID}`);
+      return callback();
+    }
     return datamanager.getFileUrl(assetID)
     .then(url => callback(null, url))
     .catch((error) => {
@@ -67,6 +71,10 @@ function setupDatamanager(config) {
 
   function filterImage(assetID, minSize, callback = minSize) {
     if (!assetID) {
+      return callback();
+    }
+    if (!(typeof assetID === 'string')) {
+      console.error(`FileURL in visual-cms.website filterImage is invalid: ${assetID}`);
       return callback();
     }
     if (typeof minSize !== 'number') {
@@ -88,6 +96,10 @@ function setupDatamanager(config) {
 
   function filterImageThumb(assetID, minSize, callback = minSize) {
     if (!assetID) {
+      return callback();
+    }
+    if (!(typeof assetID === 'string')) {
+      console.error(`FileURL in visual-cms.website filterImageThumb is invalid: ${assetID}`);
       return callback();
     }
     if (typeof minSize !== 'number') {
