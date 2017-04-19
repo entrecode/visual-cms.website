@@ -6,7 +6,7 @@ const objectSymbol = Symbol('object-src');
 const styleSymbol = Symbol('style-src');
 const imgSymbol = Symbol('img-src');
 const mediaSymbol = Symbol('media-src');
-const frameSymbol = Symbol('frame-src');
+const childSymbol = Symbol('child-src');
 const fontSymbol = Symbol('font-src');
 const connectSymbol = Symbol('connect-src');
 
@@ -37,7 +37,7 @@ class CSP {
     this[styleSymbol] = [CSP.SELF];
     this[imgSymbol] = ['*'];
     this[mediaSymbol] = ['*'];
-    this[frameSymbol] = ['*'];
+    this[childSymbol] = [CSP.NONE];
     this[fontSymbol] = [
       CSP.SELF,
       '*.entrecode.de',
@@ -93,8 +93,15 @@ class CSP {
     return this[mediaSymbol];
   }
 
-  get 'frame-src'() {
-    return this[frameSymbol];
+  get 'child-src'() {
+    return this[childSymbol];
+  }
+
+  set 'child-src'(newValue) {
+    if (!Array.isArray(newValue)) {
+      throw new Error('could not set CSP property, expected Array');
+    }
+    this[childSymbol] = newValue;
   }
 
   get 'font-src'() {
@@ -127,7 +134,7 @@ class CSP {
       'style-src',
       'img-src',
       'media-src',
-      'frame-src',
+      'child-src',
       'font-src',
       'connect-src',
     ]
