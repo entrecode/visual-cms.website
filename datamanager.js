@@ -30,7 +30,7 @@ function setupDatamanager(config) {
       .then(([entryID, levels]) => {
         if (dmCache && (!levels || levels === 0)) { // dmCache does not support leveled requests
           return dmCache.getEntry(modelName, entryID)
-            .then(value => ({ value }));
+          .then(value => ({ value }));
         }
         return leveledEntryCache.wrap(`${modelName}-${entryID}-${levels || 0}`, () => {
           return datamanager.model(modelName).entry(entryID, levels);
@@ -50,19 +50,26 @@ function setupDatamanager(config) {
   }
 
   function filterFile(assetID, callback) {
-    if (!assetID) {
-      return callback();
-    }
-    if (!(typeof assetID === 'string')) {
-      console.error(`FileURL in visual-cms.website filterFile is invalid: ${assetID}`);
-      return callback();
-    }
-    return datamanager.getFileUrl(assetID)
+    return Promise.resolve()
+    .then(() => {
+      if (!assetID) {
+        throw new Error('empty callback');
+      }
+      if (!(typeof assetID === 'string')) {
+        if ('assetID' in assetID && typeof assetID.assetID === 'string') {
+          return assetID.assetID;
+        }
+        console.error(`FileURL in visual-cms.website filterFile is invalid: ${assetID}`);
+        throw new Error('empty callback');
+      }
+      return assetID;
+    })
+    .then(id => datamanager.getFileUrl(id))
     .then(url => callback(null, url))
     .catch((error) => {
       if (error.status === 404) {
         console.error(`FileURL not found: ${assetID}`);
-      } else {
+      } else if (error.message !== 'empty callback') {
         console.error(error.message);
       }
       return callback();
@@ -70,53 +77,73 @@ function setupDatamanager(config) {
   }
 
   function filterImage(assetID, minSize, callback = minSize) {
-    if (!assetID) {
-      return callback();
-    }
-    if (!(typeof assetID === 'string')) {
-      console.error(`FileURL in visual-cms.website filterImage is invalid: ${assetID}`);
-      return callback();
-    }
-    if (typeof minSize !== 'number') {
-      minSize = null;
-    }
-    memoryCache.wrap(assetID + (minSize || ''), (cacheCallback) => {
-      datamanager.getImageUrl(assetID, minSize)
-      .then(url => cacheCallback(null, url))
-      .catch((error) => {
-        if (error.status === 404) {
-          console.error(`ImageURL not found: ${assetID}`);
-        } else {
-          console.error(error.message);
+    return Promise.resolve()
+    .then(() => {
+      if (!assetID) {
+        throw new Error('no assetID');
+      }
+      if (!(typeof assetID === 'string')) {
+        if ('assetID' in assetID && typeof assetID.assetID === 'string') {
+          return assetID.assetID;
         }
-        cacheCallback();
-      });
-    }, callback);
+        console.error(`FileURL in visual-cms.website filterImage is invalid: ${assetID}`);
+        throw new Error('invalid assetID');
+      }
+      return assetID;
+    })
+    .then((id) => {
+      if (typeof minSize !== 'number') {
+        minSize = null;
+      }
+      memoryCache.wrap(id + (minSize || ''), (cacheCallback) => {
+        datamanager.getImageUrl(id, minSize)
+        .then(url => cacheCallback(null, url))
+        .catch((error) => {
+          if (error.status === 404) {
+            console.error(`ImageURL not found: ${id}`);
+          } else {
+            console.error(error.message);
+          }
+          cacheCallback();
+        });
+      }, callback);
+    })
+    .catch(() => callback());
   }
 
   function filterImageThumb(assetID, minSize, callback = minSize) {
-    if (!assetID) {
-      return callback();
-    }
-    if (!(typeof assetID === 'string')) {
-      console.error(`FileURL in visual-cms.website filterImageThumb is invalid: ${assetID}`);
-      return callback();
-    }
-    if (typeof minSize !== 'number') {
-      minSize = null;
-    }
-    memoryCache.wrap(assetID + (minSize || ''), (cacheCallback) => {
-      datamanager.getImageThumbUrl(assetID, minSize)
-      .then(url => cacheCallback(null, url))
-      .catch((error) => {
-        if (error.status === 404) {
-          console.error(`ImageThumbURL not found: ${assetID}`);
-        } else {
-          console.error(error.message);
+    return Promise.resolve()
+    .then(() => {
+      if (!assetID) {
+        throw new Error('no assetID');
+      }
+      if (!(typeof assetID === 'string')) {
+        if ('assetID' in assetID && typeof assetID.assetID === 'string') {
+          return assetID.assetID;
         }
-        cacheCallback();
-      });
-    }, callback);
+        console.error(`FileURL in visual-cms.website filterImageThumb is invalid: ${assetID}`);
+        throw new Error('invalid assetID');
+      }
+      return assetID;
+    })
+    .then((id) => {
+      if (typeof minSize !== 'number') {
+        minSize = null;
+      }
+      memoryCache.wrap(id + (minSize || ''), (cacheCallback) => {
+        datamanager.getImageThumbUrl(id, minSize)
+        .then(url => cacheCallback(null, url))
+        .catch((error) => {
+          if (error.status === 404) {
+            console.error(`ImageThumbURL not found: ${id}`);
+          } else {
+            console.error(error.message);
+          }
+          cacheCallback();
+        });
+      }, callback);
+    })
+    .catch(() => callback());
   }
 
   function filterEntry(entryID, model, levels, callback = levels) {
