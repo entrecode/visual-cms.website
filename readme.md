@@ -240,7 +240,7 @@ If no `options` is given, the language is set to the configured default locale. 
 #### xss (string)
 
 Protects from common Cross-Site-Scripting (XSS) Attacks, using [js-xss](https://www.npmjs.com/package/xss).
-Additionally to the default settings, `style` and `class` attributes are allowed on all tags.
+Additionally to the default settings, `style`, `id` and `class` attributes are allowed on all tags.
 
 **Attention:**
 
