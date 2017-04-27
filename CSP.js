@@ -9,6 +9,7 @@ const mediaSymbol = Symbol('media-src');
 const childSymbol = Symbol('child-src');
 const fontSymbol = Symbol('font-src');
 const connectSymbol = Symbol('connect-src');
+const manifestSymbol = Symbol('manifest-src');
 
 /**
  * A Content Security Policy
@@ -46,6 +47,7 @@ class CSP {
       CSP.SELF,
       '*.entrecode.de',
     ];
+    this[manifestSymbol] = [CSP.SELF];
   }
 
   get 'default-src'() {
@@ -126,6 +128,17 @@ class CSP {
     this[connectSymbol] = newValue;
   }
 
+  get 'manifest-src'() {
+    return this[connectSymbol];
+  }
+
+  set 'manifest-src'(newValue) {
+    if (!Array.isArray(newValue)) {
+      throw new Error('could not set CSP property, expected Array');
+    }
+    this[manifestSymbol] = newValue;
+  }
+
   middleware(req, res, next) {
     const contentSecurityPolicy = [
       'default-src',
@@ -137,6 +150,7 @@ class CSP {
       'child-src',
       'font-src',
       'connect-src',
+      'manifest-src',
     ]
     .map(key => `${key} ${this[key].join(' ')}`)
     .join('; ');
