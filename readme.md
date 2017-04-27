@@ -108,7 +108,7 @@ By default, the express app uses a
 It allows common stuff, but e.g. disallows loading JavaScript from other servers. If you want that,
 you have to add the hostnames to the CSP. The returned `csp` object has the following constants
 defined: `csp.NONE`, `csp.UNSAFEINLINE`, `csp.SELF`.
-You can set `csp.script-src`, `csp.style-src`, `csp.img-src`, `csp.font-src`, `csp.child-src` and `csp.connect-src` to Arrays of other values, like this:
+You can set `csp.script-src`, `csp.style-src`, `csp.img-src`, `csp.font-src`, `csp.child-src`, `csp.connect-src` and `csp.manifest-src` to Arrays of other values, like this:
 ```js
 csp['script-src'] = [
   csp.SELF,
@@ -240,7 +240,7 @@ If no `options` is given, the language is set to the configured default locale. 
 #### xss (string)
 
 Protects from common Cross-Site-Scripting (XSS) Attacks, using [js-xss](https://www.npmjs.com/package/xss).
-Additionally to the default settings, `style` and `class` attributes are allowed on all tags.
+Additionally to the default settings, `style`, `id` and `class` attributes are allowed on all tags.
 
 **Attention:**
 
