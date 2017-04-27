@@ -129,7 +129,7 @@ class CSP {
   }
 
   get 'manifest-src'() {
-    return this[connectSymbol];
+    return this[manifestSymbol];
   }
 
   set 'manifest-src'(newValue) {
