@@ -27,14 +27,15 @@ function setupDatamanager(config) {
   function loadFromDataManagerOrCache(modelName, requestType, ...args) {
     if (requestType === 'entry') {
       return Promise.resolve(args)
-      .then(([entryID, levels]) => {
-        if (dmCache && (!levels || levels === 0)) { // dmCache does not support leveled requests
+      .then(([entryID, levels, fields]) => {
+        if (dmCache && (!levels || levels === 0) && !fields) { // dmCache does not support leveled requests
           return dmCache.getEntry(modelName, entryID)
           .then(value => ({ value }));
         }
-        return leveledEntryCache.wrap(`${modelName}-${entryID}-${levels || 0}`, () => {
-          return datamanager.model(modelName).entry(entryID, levels);
-        });
+        return leveledEntryCache.wrap(
+          `${modelName}-${entryID}-${levels || 0}-${fields ? fields.join() : 'all_fields'}`, () => {
+            return datamanager.model(modelName).entry(entryID, levels, fields);
+          });
       });
     }
     if (requestType === 'entries') {
@@ -172,7 +173,7 @@ function setupDatamanager(config) {
     return Promise.resolve(configObject.model)
     .then((model) => {
       if (configObject.entryID) {
-        return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels)
+        return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels, configObject.fields)
         .then(entry => entry.value);
       }
       return loadFromDataManagerOrCache(model, 'entries', configObject)
