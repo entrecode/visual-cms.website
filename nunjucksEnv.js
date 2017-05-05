@@ -9,9 +9,8 @@ const xss = require('xss');
 
 const xssWhitelist = {}; // allow style and class attributes on all tags
 Object.keys(xss.whiteList).forEach((tagName) => {
-  xssWhitelist[tagName] = xss.whiteList[tagName].concat(['style', 'class', 'id']);
+  xssWhitelist[tagName] = xss.whiteList[tagName].concat(['style', 'class', 'id', 'height']);
 });
-xssWhitelist['table'] = xss.whiteList['table'].concat(['height']);
 
 function setupNunjucksEnv(config, datamanager) {
 
