@@ -40,7 +40,7 @@ function setupDatamanager(config) {
     }
     if (requestType === 'entries') {
       return Promise.resolve(args)
-      .then(([{ size, page, sort, filter }]) => ({ size, page, sort, filter }))
+      .then(([{ size, page, sort, filter, fields }]) => ({ size, page, sort, filter, fields }))
       .then((configObject) => {
         return entriesCache.wrap(`${modelName}-${JSON.stringify(configObject)}`, () => {
           return datamanager.model(modelName).entries(configObject);
