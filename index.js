@@ -7,17 +7,23 @@ const CSP = require('./CSP');
 const cache = require('./cache');
 const instances = new Map();
 
-module.exports = function(projectName, basedir) {
+module.exports = function (projectName, basedir) {
   if (instances.has(projectName)) {
     return instances.get(projectName);
   }
 
   const config = ('customers' in configModule && projectName in configModule.customers) ? configModule.customers[projectName] : configModule;
   config.basedir = basedir;
+  const options = config.variableStart && config.variableEnd ? {
+    tags: {
+      variableStart: config.variableStart,
+      variableEnd: config.variableEnd
+    }
+  } : {};
   const csp = new CSP();
   const expressApp = libExpress(config, csp);
   const datamanager = libDatamanager(config);
-  const nunjucksEnv = libNunjucksEnv(config, datamanager);
+  const nunjucksEnv = libNunjucksEnv(config, datamanager, options);
 
   nunjucksEnv.express(expressApp);
 

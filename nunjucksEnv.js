@@ -12,12 +12,11 @@ Object.keys(xss.whiteList).forEach((tagName) => {
   xssWhitelist[tagName] = xss.whiteList[tagName].concat(['style', 'class', 'id', 'height']);
 });
 
-function setupNunjucksEnv(config, datamanager) {
-
+function setupNunjucksEnv(config, datamanager, options) {
   const nunjucksEnv = new nunjucks.Environment([
     new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
     new datamanager.TemplateLoader(),
-  ]);
+  ], options);
 
   nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
   nunjucksEnv.addFilter('dm_file', datamanager.filterFile, true);
