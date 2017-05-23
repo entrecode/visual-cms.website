@@ -90,7 +90,9 @@ analyticsID: UA-0000000-0
 clientID: local-development
 apiKey: # add JWT here if needed
 disableTemplateCache : false
-memoryCacheTtl: 3600 # in seconds => 1 hour
+memoryCacheTtl: 3600 # in seconds => 1 hour,
+variableStart: '{$',    #custom variable start, default: '{{'
+variableEnd: '$}'       #custom variable end, default '}}'
 ```
 
 ### `express` export
