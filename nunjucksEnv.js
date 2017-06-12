@@ -25,6 +25,7 @@ function setupNunjucksEnv(config, datamanager) {
     onTagAttr: () => {},
     onIgnoreTag: () => {},
     onIgnoreTagAttr: () => {},
+    xss,
   };
 
   nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
