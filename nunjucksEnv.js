@@ -20,7 +20,7 @@ function setupNunjucksEnv(config, datamanager) {
   ]);
 
   nunjucksEnv.xss = {
-    whiteList: xssWhitelist,
+    whiteList: Object.assign({}, xssWhitelist),
     onTag: () => {},
     onTagAttr: () => {},
     onIgnoreTag: () => {},
