@@ -11,13 +11,21 @@ const xssWhitelist = {}; // allow style and class attributes on all tags
 Object.keys(xss.whiteList).forEach((tagName) => {
   xssWhitelist[tagName] = xss.whiteList[tagName].concat(['style', 'class', 'id', 'height']);
 });
-xssWhitelist.map = ['style', 'class', 'id', 'height'];
 
-function setupNunjucksEnv(config, datamanager, options) {
+function setupNunjucksEnv(config, datamanager) {
+
   const nunjucksEnv = new nunjucks.Environment([
     new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
     new datamanager.TemplateLoader(),
-  ], options);
+  ]);
+
+  nunjucksEnv.xss = {
+    whiteList: Object.assign({}, xssWhitelist),
+    onTag: () => {},
+    onTagAttr: () => {},
+    onIgnoreTag: () => {},
+    onIgnoreTagAttr: () => {},
+  };
 
   nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
   nunjucksEnv.addFilter('dm_file', datamanager.filterFile, true);
@@ -29,7 +37,7 @@ function setupNunjucksEnv(config, datamanager, options) {
   nunjucksEnv.addFilter('date_relative', (date, locale, tz) => moment(date).tz(tz || config.timezone).locale(locale ||
     config.locale).fromNow());
   nunjucksEnv.addFilter('speakingurl', (input, options = { lang: config.locale }) => speakingurl(input, options));
-  nunjucksEnv.addFilter('xss', input => xss(input, { whiteList: xssWhitelist }));
+  nunjucksEnv.addFilter('xss', input => xss(input, nunjucksEnv.xss));
   nunjucksEnv.addFilter('vcms', vcms.toDOM);
 
   const extensionsPath = path.resolve(config.basedir, './extensions');
