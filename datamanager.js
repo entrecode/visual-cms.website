@@ -10,17 +10,7 @@ function setupDatamanager(config) {
     store: 'memory',
     max: 100,
     ttl: config.memoryCacheTtl
-  }); // generic
-  const leveledEntryCache = cacheManager.caching({
-    store: 'memory',
-    max: 100,
-    ttl: config.memoryCacheTtl
-  });
-  const entriesCache = cacheManager.caching({
-    store: 'memory',
-    max: 100,
-    ttl: config.memoryCacheTtl,
-  });
+  }); // generic (asset helpers)
 
   const datamanager = new Datamanager({ url: config.datamanagerURL });
 
@@ -28,23 +18,20 @@ function setupDatamanager(config) {
     if (requestType === 'entry') {
       return Promise.resolve(args)
       .then(([entryID, levels, fields]) => {
-        if (dmCache && (!levels || levels === 0) && !fields) { // dmCache does not support leveled requests
-          return dmCache.getEntry(modelName, entryID)
-          .then(value => ({ value }));
+        if (dmCache) { // dmCache does not support leveled requests
+          return dmCache.getEntry(modelName, entryID, fields, levels);
         }
-        return leveledEntryCache.wrap(
-          `${modelName}-${entryID}-${levels || 0}-${fields ? fields.join() : 'all_fields'}`, () => {
-            return datamanager.model(modelName).entry(entryID, levels, fields);
-          });
+        return datamanager.model(modelName).entry(entryID, levels, fields);
       });
     }
     if (requestType === 'entries') {
       return Promise.resolve(args)
       .then(([{ size, page, sort, filter, fields }]) => ({ size, page, sort, filter, fields }))
       .then((configObject) => {
-        return entriesCache.wrap(`${modelName}-${JSON.stringify(configObject)}`, () => {
-          return datamanager.model(modelName).entries(configObject);
-        });
+        if (dmCache) {
+          return dmCache.getEntries(modelName, configObject);
+        }
+        return datamanager.model(modelName).entries(configObject);
       });
     }
     throw new Error(`unknown requestType: '${requestType}'`);
@@ -232,7 +219,7 @@ function setupDatamanager(config) {
   function useDMCache(dmCacheInstance) {
     dmCache = dmCacheInstance;
     dmCache.setDataManagerInstance(datamanager);
-    dmCache.eventEmitter.on('updatedCache', ({ type, model, entryID }) => {
+    dmCache.eventEmitter.on('entryUpdated', ({ type, model, entryID }) => {
       const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
       .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
       .reduce((a, b) => Object.assign(a, b), {});
