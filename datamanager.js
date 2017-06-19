@@ -36,7 +36,7 @@ function setupDatamanager(config) {
       })
       .then((entryList) => {
         if (!('dmCacheHitFrom' in entryList)) {
-          return entryList.entries;
+          return entryList.entries.map(entry => entry.value);
         }
         return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
       });
