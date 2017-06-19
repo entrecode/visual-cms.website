@@ -18,11 +18,12 @@ function setupDatamanager(config) {
     if (requestType === 'entry') {
       return Promise.resolve(args)
       .then(([entryID, levels, fields]) => {
-        if (dmCache) { // dmCache does not support leveled requests
+        if (dmCache) {
           return dmCache.getEntry(modelName, entryID, fields, levels);
         }
         return datamanager.model(modelName).entry(entryID, levels, fields);
-      });
+      })
+      .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}));
     }
     if (requestType === 'entries') {
       return Promise.resolve(args)
@@ -32,6 +33,12 @@ function setupDatamanager(config) {
           return dmCache.getEntries(modelName, configObject);
         }
         return datamanager.model(modelName).entryList(configObject);
+      })
+      .then((entryList) => {
+        if (!('dmCacheHitFrom' in entryList)) {
+          return entryList.entries;
+        }
+        return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
       });
     }
     throw new Error(`unknown requestType: '${requestType}'`);
@@ -136,7 +143,6 @@ function setupDatamanager(config) {
 
   function filterEntry(entryID, model, levels, callback = levels) {
     loadFromDataManagerOrCache(model, 'entry', entryID, levels && levels < 4 ? levels : null)
-    .then(entry => entry.value)
     .then(entry => callback(null, entry))
     .catch(e => callback(new Error(e.title)));
   }
@@ -160,16 +166,9 @@ function setupDatamanager(config) {
     return Promise.resolve(configObject.model)
     .then((model) => {
       if (configObject.entryID) {
-        return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels, configObject.fields)
-        .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}));
+        return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels, configObject.fields);
       }
-      return loadFromDataManagerOrCache(model, 'entries', configObject)
-      .then((entryList) => {
-        if (!('dmCacheHitFrom' in entryList)) {
-          return entryList.entries;
-        }
-        return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
-      });
+      return loadFromDataManagerOrCache(model, 'entries', configObject);
     })
     .then(result => {
       return result;
@@ -199,7 +198,6 @@ function setupDatamanager(config) {
           throw new Error(`dynamic templates '${templateType}' not defined`)
         }
         return loadFromDataManagerOrCache(config.dynamicTemplates[templateType].model, 'entry', entryID)
-        .then(entry => entry.value)
         .then(template => ({
           path: name,
           src: `
