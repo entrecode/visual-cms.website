@@ -31,7 +31,7 @@ function setupDatamanager(config) {
         if (dmCache) {
           return dmCache.getEntries(modelName, configObject);
         }
-        return datamanager.model(modelName).entries(configObject);
+        return datamanager.model(modelName).entryList(configObject);
       });
     }
     throw new Error(`unknown requestType: '${requestType}'`);
@@ -164,8 +164,12 @@ function setupDatamanager(config) {
         .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}));
       }
       return loadFromDataManagerOrCache(model, 'entries', configObject)
-      .then(entries => Array.isArray(entries) ? entries : [entries])
-      .then(entries => entries.map(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null})))
+      .then((entryList) => {
+        if (!('dmCacheHitFrom' in entryList)) {
+          return entryList.entries;
+        }
+        return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
+      });
     })
     .then(result => {
       return result;
