@@ -218,7 +218,6 @@ function setupDatamanager(config) {
 
   function useDMCache(dmCacheInstance) {
     dmCache = dmCacheInstance;
-    dmCache.setDataManagerInstance(datamanager);
     dmCache.eventEmitter.on('entryUpdated', ({ type, model, entryID }) => {
       const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
       .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
