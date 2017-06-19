@@ -161,11 +161,11 @@ function setupDatamanager(config) {
     .then((model) => {
       if (configObject.entryID) {
         return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels, configObject.fields)
-        .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null});
+        .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}));
       }
       return loadFromDataManagerOrCache(model, 'entries', configObject)
       .then(entries => Array.isArray(entries) ? entries : [entries])
-      .then(entries => entries.map(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}))
+      .then(entries => entries.map(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null})))
     })
     .then(result => {
       return result;
