@@ -7,7 +7,7 @@ const CSP = require('./CSP');
 const cache = require('./cache');
 const instances = new Map();
 
-module.exports = function (projectName, basedir) {
+module.exports = function (projectName, basedir, disableDataManager = false) {
   if (instances.has(projectName)) {
     return instances.get(projectName);
   }
@@ -22,7 +22,7 @@ module.exports = function (projectName, basedir) {
   } : {};
   const csp = new CSP();
   const expressApp = libExpress(config, csp);
-  const datamanager = libDatamanager(config);
+  const datamanager = !disableDataManager || libDatamanager(config);
   const nunjucksEnv = libNunjucksEnv(config, datamanager, options);
 
   nunjucksEnv.express(expressApp);
