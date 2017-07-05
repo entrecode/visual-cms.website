@@ -56,7 +56,7 @@ const {
   datamanager,
   nunjucksEnv,
   cache,
-} = require('visual-cms.website')('mywebsite', __dirname);
+} = require('visual-cms.website')('mywebsite', __dirname, false);
 ```
 
 This is the full import with all exported properties. As seen in the minimal example above, you 
