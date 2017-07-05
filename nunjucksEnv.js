@@ -13,11 +13,18 @@ Object.keys(xss.whiteList).forEach((tagName) => {
 });
 
 function setupNunjucksEnv(config, datamanager, options) {
+  let nunjucksEnv;
 
-  const nunjucksEnv = new nunjucks.Environment([
-    new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
-    new datamanager.TemplateLoader(),
-  ], options);
+  if (datamanager) {
+    nunjucksEnv = new nunjucks.Environment([
+      new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
+      new datamanager.TemplateLoader(),
+    ], options);
+  } else {
+    nunjucksEnv = new nunjucks.Environment([
+      new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
+    ], options);
+  }
 
   nunjucksEnv.xss = {
     whiteList: Object.assign({}, xssWhitelist),
@@ -28,11 +35,13 @@ function setupNunjucksEnv(config, datamanager, options) {
     xss,
   };
 
-  nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
-  nunjucksEnv.addFilter('dm_file', datamanager.filterFile, true);
-  nunjucksEnv.addFilter('dm_image', datamanager.filterImage, true);
-  nunjucksEnv.addFilter('dm_thumbnail', datamanager.filterImageThumb, true);
-  nunjucksEnv.addFilter('dm_linkedEntryTitle', datamanager.filterLinkedEntryTitle, false);
+  if (datamanager) {
+    nunjucksEnv.addFilter('dm_entry', datamanager.filterEntry, true);
+    nunjucksEnv.addFilter('dm_file', datamanager.filterFile, true);
+    nunjucksEnv.addFilter('dm_image', datamanager.filterImage, true);
+    nunjucksEnv.addFilter('dm_thumbnail', datamanager.filterImageThumb, true);
+    nunjucksEnv.addFilter('dm_linkedEntryTitle', datamanager.filterLinkedEntryTitle, false);
+  }
   nunjucksEnv.addFilter('date_format', (date, format, locale, tz) => moment(date).tz(tz ||
     config.timezone).locale(locale || config.locale).format(format));
   nunjucksEnv.addFilter('date_relative', (date, locale, tz) => moment(date).tz(tz || config.timezone).locale(locale ||

@@ -56,7 +56,7 @@ const {
   datamanager,
   nunjucksEnv,
   cache,
-} = require('visual-cms.website')('mywebsite', __dirname);
+} = require('visual-cms.website')('mywebsite', __dirname, false);
 ```
 
 This is the full import with all exported properties. As seen in the minimal example above, you 
@@ -69,6 +69,8 @@ expected for config, templates etc.).
 The returned module instance is a Singleton. If you require the module with the same project name
 as first parameter again in another sub-library of your project, you'll get the same. This makes
 it possible to e.g. reuse the Nunjucks Environment and your router object.
+
+Since version 0.3.0 there is a optional third property `disableDataManager` which defaults to `false`. You can set this to `true` if you do not want any Data Manager integration. Note that some Nunchucks filter won't be available when this is disabled.
 
 ### `config` export
 The module exports a config JSON object. It is by default rendered from `/config/default.yml` and `/config/local.yml`.
@@ -137,7 +139,7 @@ Same as the middleware, but not as middleware. Just give the response object to 
 
 ### `datamanager` export
 Some optimized methods to load data from [ec.datamanger](https://www.npmjs.com/package/ec.datamanager),
-but with in-memory caching.
+but with in-memory caching. When the Data Manager integration is disabled this export is `false`.
 
 #### datamanager.load(json)
 The argument `json` is expected to be an object with arbitrary keys and values that are objects.
