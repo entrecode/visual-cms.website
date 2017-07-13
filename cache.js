@@ -9,11 +9,7 @@ function set(res, ttl, ...args) {
 
 function middleware(ttl, ...args) {
   return (req, res, next) => {
-    if(req.query.cache === 'off'){
-      set(res, 0, NO_CACHE);
-    } else {
-      set(res, ttl, ...args);
-    }
+    set(res, ttl, ...args);
     next();
   };
 }
