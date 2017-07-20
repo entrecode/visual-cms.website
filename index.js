@@ -22,7 +22,12 @@ module.exports = function (projectName, basedir, disableDataManager = false) {
   } : {};
   const csp = new CSP();
   const expressApp = libExpress(config, csp);
-  const datamanager = disableDataManager || libDatamanager(config);
+  let datamanager;
+  if (disableDataManager) {
+    datamanager = false
+  } else {
+    datamanager = libDatamanager(config);
+  }
   const nunjucksEnv = libNunjucksEnv(config, datamanager, options);
 
   nunjucksEnv.express(expressApp);
