@@ -141,10 +141,15 @@ function setupDatamanager(config) {
     .catch(() => callback());
   }
 
-  function filterEntry(entryID, model, levels, callback = levels) {
+  function filterEntry(entryID, model, levels, kwargs = levels, callback = kwargs) {
     loadFromDataManagerOrCache(model, 'entry', entryID, levels && levels < 4 ? levels : null)
     .then(entry => callback(null, entry))
-    .catch(e => callback(new Error(e.title)));
+    .catch((e) => {
+      if (kwargs && typeof kwargs === 'object' && 'ignoreErrors' in kwargs && kwargs.ignoreErrors) {
+        return callback(null, null);
+      }
+      return callback(new Error(e.title))
+    });
   }
 
   function filterLinkedEntryTitle(entry, field) {

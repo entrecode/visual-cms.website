@@ -202,11 +202,17 @@ disable the cache for development.
 
 Additionally to the [builtin filters](https://mozilla.github.io/nunjucks/templating.html#builtin-filters), we provide a few extra filters for use inside templates:
 
-#### dm_entry (entryID, modelTitle, [levels])
+#### dm_entry (entryID, modelTitle, [levels], [options])
 
 Loads a full entry from the specified model. **Note:** to get the title of a linked entry, you will not need this filter: it is already included in the resources' `_links`. 
 This filter is only needed if you need additional properties for a given `entryID` other than the title field property.
 The optional `levels` argument can be used to load nested entries as well; the maximum level depth is 3.
+This filter also supports Nunjucks keyword arguments for the option "ignoreErrors":
+
+```
+{{ entryID | dm_entry(modelTitle, 2, ignoreErrors=true }}
+```
+This will return `null` if the entry is not found.
 
 #### dm_file (assetID)
 
