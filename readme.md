@@ -263,3 +263,18 @@ You **always** should use this when using Nunjuck's `safe` filter:
 
 Renders HTML from a Visual CMS Object, using its [toDOM](https://www.npmjs.com/package/visual-cms.core) method.
 
+#### fileFromAsset (entry, field)
+
+Returns a file url for an asset identified by `field`. `entry` must embed the requested asset.
+
+#### imageFromAsset (entry, field, size)
+
+Returns a image url for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
+
+#### thumbFromAsset (entry, field, size)
+
+Returns a thumb image url for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
+
+#### altTextFromAsset (entry, field)
+
+Returns an alt text (read: asset title) for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
