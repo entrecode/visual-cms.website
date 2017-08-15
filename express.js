@@ -31,7 +31,7 @@ function setupExpress(config, csp) {
   app.use(bodyParser.json({ limit: '1mb' }));
 
   app.use(express.static(path.resolve(config.basedir, './static'), {
-    maxAge: '1 day',
+    maxAge: `${365.25 / 12} days`, // 1 month
   }));
 
   return app;
