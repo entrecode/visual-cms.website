@@ -278,3 +278,23 @@ Returns a thumb image url for an asset identified by `field` negotiated with `si
 #### altTextFromAsset (entry, field)
 
 Returns an alt text (read: asset title) for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
+
+
+
+## Troubleshooting
+
+### SyntaxError: Invalid or unexpected token
+
+This error:
+
+>  Template render error: (...path...)
+>  SyntaxError: Invalid or unexpected token
+
+is often triggered after pasting code into templates. Usually, the code contains non-displayable characters.
+To find them, search for `[^\x00-\xFF]` in your code and don't forget to enable RegEx searching. The characters will be highlighted. After deletion it should work.
+
+### Imported Partial is not being displayed
+
+Probably the partial does something asynchronous (e.g. load an image asset URL) and your `{% include %}` statement is inside a `{% for %}` loop. Use `{% asyncAll %}` or `{% asyncEach%}` instead.
+
+
