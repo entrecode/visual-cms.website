@@ -5,26 +5,27 @@ const libExpress = require('./express');
 const libNunjucksEnv = require('./nunjucksEnv');
 const CSP = require('./CSP');
 const cache = require('./cache');
+
 const instances = new Map();
 
-module.exports = function (projectName, basedir, disableDataManager = false) {
+module.exports = (projectName, basedir, disableDataManager = false) => {
   if (instances.has(projectName)) {
     return instances.get(projectName);
   }
 
-  const config = ('customers' in configModule && projectName in configModule.customers) ? configModule.customers[projectName] : configModule;
+  const config = 'customers' in configModule && projectName in configModule.customers ? configModule.customers[projectName] : configModule;
   config.basedir = basedir;
   const options = config.variableStart && config.variableEnd ? {
     tags: {
       variableStart: config.variableStart,
-      variableEnd: config.variableEnd
-    }
+      variableEnd: config.variableEnd,
+    },
   } : {};
   const csp = new CSP();
   const expressApp = libExpress(config, csp);
   let datamanager;
   if (disableDataManager) {
-    datamanager = false
+    datamanager = false;
   } else {
     datamanager = libDatamanager(config);
   }
@@ -43,6 +44,9 @@ module.exports = function (projectName, basedir, disableDataManager = false) {
     datamanager,
     nunjucksEnv,
     cache,
+    newNunjucksEnv: () => {
+      return libNunjucksEnv(config, datamanager, options);
+    },
   };
 
   instances.set(projectName, instance);

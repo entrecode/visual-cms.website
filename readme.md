@@ -153,6 +153,9 @@ Note that the date you try to load needs to be publicly available (i.e. needs a 
 There is also da Nunjucks Template loader that allows loading templates from Data Manager.
 
 `datamanager.datamanager` is the actual SDK instance, but should only be used for writing data, not for reading.
+
+### `newNunjucksEnv()` export
+Creates a new nunjucks environment like the exported `nunjucksEnv`. Can be used to create two different environments if needed.
  
 ### `nunjucksEnv` export
 Your [Nunjucks Environment](https://mozilla.github.io/nunjucks/api.html#environment).
