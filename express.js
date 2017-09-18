@@ -22,7 +22,6 @@ function setupExpress(config, csp) {
   app.use((req, res, next) => csp.middleware(req, res, next));
 
   app.use((req, res, next) => {
-
     res.header('Access-Control-Allow-Origin', config.publicURL);
     return next();
   });
