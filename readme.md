@@ -266,22 +266,21 @@ You **always** should use this when using Nunjuck's `safe` filter:
 
 Renders HTML from a Visual CMS Object, using its [toDOM](https://www.npmjs.com/package/visual-cms.core) method.
 
-#### fileFromAsset (entry, field)
+#### Asset Helper
 
-Returns a file url for an asset identified by `field`. `entry` must embed the requested asset.
+The nunjucks environment includes three different filter for assets. One for files, images, and thumbnails. The helper will handle three main input types: A string assetID, an entry with embedded assets, or a resolved asset (loaded with a leveled request).
 
-#### imageFromAsset (entry, field, size)
+##### file(field?)
 
-Returns a image url for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
+Returns the original file for this asset. `field` is the optional field name for embedded assets.
 
-#### thumbFromAsset (entry, field, size)
+##### image(field?, size?)
 
-Returns a thumb image url for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
+Returns an image with at least `size` dimensions. `field` is the optional field name for embedded assets.
 
-#### altTextFromAsset (entry, field)
+##### thumb(field?, size?)
 
-Returns an alt text (read: asset title) for an asset identified by `field` negotiated with `size`. `entry` must embed the requested asset.
-
+Returns an image thumbnail with at least `size` dimensions. `field` is the optional field name for embedded assets.
 
 
 ## Troubleshooting
