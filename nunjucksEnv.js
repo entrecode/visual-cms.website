@@ -7,7 +7,7 @@ const path = require('path');
 const vcms = require('visual-cms.core');
 const xss = require('xss');
 
-const assetHelper = require('./assetHelper');
+const assets = require('./assetFilter');
 
 const xssWhitelist = {}; // allow style and class attributes on all tags
 Object.keys(xss.whiteList).forEach((tagName) => {
@@ -51,10 +51,10 @@ function setupNunjucksEnv(config, datamanager, options) {
   nunjucksEnv.addFilter('speakingurl', (input, options = { lang: config.locale }) => speakingurl(input, options));
   nunjucksEnv.addFilter('xss', input => xss(input, nunjucksEnv.xss));
   nunjucksEnv.addFilter('vcms', vcms.toDOM);
-  nunjucksEnv.addFilter('fileFromAsset', assetHelper.fileFilter);
-  nunjucksEnv.addFilter('imageFromAsset', assetHelper.imageFilter);
-  nunjucksEnv.addFilter('thumbFromAsset', assetHelper.thumbFilter);
-  nunjucksEnv.addFilter('altTextFromAsset', assetHelper.thumbFilter);
+
+  nunjucksEnv.addFilter('file', assets.fileFilter);
+  nunjucksEnv.addFilter('image', assets.imageFilter);
+  nunjucksEnv.addFilter('thumb', assets.thumbFilter);
 
   const extensionsPath = path.resolve(config.basedir, './extensions');
   try {
@@ -71,4 +71,5 @@ function setupNunjucksEnv(config, datamanager, options) {
 
   return nunjucksEnv;
 }
+
 module.exports = setupNunjucksEnv;

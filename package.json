@@ -19,6 +19,7 @@
     "config": "^1.26.1",
     "cookie-parser": "^1.4.3",
     "ec.datamanager": "^0.12.2",
+    "ec.sdk": "^0.8.9",
     "express": "^4.15.3",
     "express-promise-router": "^2.0.0",
     "js-yaml": "^3.8.4",
