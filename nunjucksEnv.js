@@ -52,9 +52,9 @@ function setupNunjucksEnv(config, datamanager, options) {
   nunjucksEnv.addFilter('xss', input => xss(input, nunjucksEnv.xss));
   nunjucksEnv.addFilter('vcms', vcms.toDOM);
 
-  nunjucksEnv.addFilter('file', assets.fileFilter);
-  nunjucksEnv.addFilter('image', assets.imageFilter);
-  nunjucksEnv.addFilter('thumb', assets.thumbFilter);
+  nunjucksEnv.addFilter('file', assets.fileFilter, true);
+  nunjucksEnv.addFilter('image', assets.imageFilter, true);
+  nunjucksEnv.addFilter('thumb', assets.thumbFilter, true);
 
   const extensionsPath = path.resolve(config.basedir, './extensions');
   try {
