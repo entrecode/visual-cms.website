@@ -53,7 +53,7 @@ const helper = {
     return largest.url;
   },
 
-  negotiateEmbedded: (entry, field, size, image, thumb) => {
+  negotiateEmbedded: (entry, field, size, image = false, thumb = false) => {
     if (!('_embedded' in entry)) {
       throw new Error('no embedded in entry');
     }
@@ -81,7 +81,7 @@ const helper = {
     return helper.negotiateAsset(asset, size, image, thumb);
   },
 
-  negotiateRemote: (dmConfig, assetID, size, image, thumb) => {
+  negotiateRemote: (dmConfig, assetID, size, image = false, thumb = false) => {
     if (!dmConfig) {
       throw new Error('asset negotiation with ids only need _dmConfig global in nunjucks');
     }
@@ -103,11 +103,11 @@ const helper = {
     return api.getFileUrl(assetID);
   },
 
-  negotiate: (dmConfig, input, field, size, image, thumb) => {
-    return Promise.resolve()
+  negotiate: (dmConfig, input, field, size, image, thumb) => Promise.resolve()
     .then(() => {
       if (Array.isArray(input)) {
-        return Promise.all(input.map(i => helper.negotiate(i, field, size, image, thumb)));
+        return Promise.all(input.map(i =>
+          helper.negotiate(dmConfig, i, field, size, image, thumb)));
       } else if (typeof input === 'object' && 'assetID' in input) {
         // input signature changes
         // input => asset, field => size, size => image, image => thumb
@@ -121,8 +121,7 @@ const helper = {
       }
 
       throw new Error('cannot handle input type');
-    });
-  },
+    }),
 };
 
 function fileFilter(input, field, callback) {
