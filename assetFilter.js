@@ -109,14 +109,10 @@ const helper = {
         return Promise.all(input.map(i =>
           helper.negotiate(dmConfig, i, field, size, image, thumb)));
       } else if (typeof input === 'object' && 'assetID' in input) {
-        // input signature changes
-        // input => asset, field => size, size => image, image => thumb
         return helper.negotiateAsset(input, field, size, image);
       } else if (typeof input === 'object' && '_embedded' in input) {
         return helper.negotiateEmbedded(input, field, size, image, thumb);
       } else if (typeof input === 'string') {
-        // input signature changes
-        // input => asset, field => size, size => image, image => thumb
         return helper.negotiateRemote(dmConfig, input, field, size, image);
       }
 
