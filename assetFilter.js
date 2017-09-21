@@ -113,7 +113,7 @@ const helper = {
       return Promise.all(input.map(i =>
         helper.negotiate(dmConfig, i, field, size, image, thumb)));
     } else if (typeof input === 'object' && 'assetID' in input) {
-      return helper.negotiateAsset(input, field, size, image);
+      return helper.negotiateAsset(input, field, size, image, thumb);
     } else if (typeof input === 'object' && '_embedded' in input) {
       return helper.negotiateEmbedded(input, field, size, image, thumb);
     } else if (typeof input === 'string') {
