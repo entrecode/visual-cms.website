@@ -105,6 +105,10 @@ const helper = {
 
   negotiate: (dmConfig, input, field, size, image, thumb) => Promise.resolve()
     .then(() => {
+      if (input === undefined) {
+        console.warn('visual-cms.website: assetHelper called with undefined');
+        return undefined;
+      }
       if (Array.isArray(input)) {
         return Promise.all(input.map(i =>
           helper.negotiate(dmConfig, i, field, size, image, thumb)));
