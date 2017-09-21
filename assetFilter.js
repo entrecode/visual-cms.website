@@ -105,19 +105,19 @@ const helper = {
 
   negotiate: (dmConfig, input, field, size, image, thumb) => Promise.resolve()
   .then(() => {
+    if (input === undefined) {
+      console.warn('visual-cms.website: assetHelper called with undefined');
+      return undefined;
+    }
     if (Array.isArray(input)) {
       return Promise.all(input.map(i =>
         helper.negotiate(dmConfig, i, field, size, image, thumb)));
     } else if (typeof input === 'object' && 'assetID' in input) {
-      // input signature changes
-      // input => asset, field => size, size => image, image => thumb
-      return helper.negotiateAsset(input, size, image, thumb);
+      return helper.negotiateAsset(input, field, size, image);
     } else if (typeof input === 'object' && '_embedded' in input) {
       return helper.negotiateEmbedded(input, field, size, image, thumb);
     } else if (typeof input === 'string') {
-      // input signature changes
-      // input => asset, field => size, size => image, image => thumb
-      return helper.negotiateRemote(dmConfig, input, size, image, thumb);
+      return helper.negotiateRemote(dmConfig, input, field, size, image);
     }
 
     throw new Error('cannot handle input type');
