@@ -1,18 +1,25 @@
 const Datamanager = require('ec.datamanager');
 const cacheManager = require('cache-manager');
 const nunjucks = require('nunjucks');
+const { PublicAPI } = require('ec.sdk');
 
 let dmCache;
 
 function setupDatamanager(config) {
-
   const memoryCache = cacheManager.caching({
     store: 'memory',
     max: 100,
-    ttl: config.memoryCacheTtl
+    ttl: config.memoryCacheTtl,
   }); // generic (asset helpers)
 
-  const datamanager = new Datamanager({ url: config.datamanagerURL });
+  const SDK = !!config.useSDK;
+  let datamanager;
+
+  if (SDK) {
+    datamanager = new PublicAPI(config.datamanagerURL);
+  } else {
+    datamanager = new Datamanager({ url: config.datamanagerURL });
+  }
 
   function loadFromDataManagerOrCache(modelName, requestType, ...args) {
     if (requestType === 'entry') {
@@ -21,22 +28,41 @@ function setupDatamanager(config) {
         if (dmCache) {
           return dmCache.getEntry(modelName, entryID, fields, levels);
         }
+        if (SDK) {
+          return datamanager.entry(modelName, entryID, { levels, fields });
+        }
         return datamanager.model(modelName).entry(entryID, levels, fields);
       })
-      .then(entry => Object.assign({}, entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null}));
+      .then(entry => Object.assign({}, SDK ? entry : entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null }));
     }
     if (requestType === 'entries') {
       return Promise.resolve(args)
-      .then(([{ size, page, sort, filter, fields }]) => ({ size, page, sort, filter, fields }))
+      .then(([{ size, page, sort, filter, fields }]) => {
+        if (SDK) {
+          return Object.assign({
+            size,
+            page,
+            sort,
+            _fields: fields,
+          }, filter);
+        }
+        return { size, page, sort, filter, fields };
+      })
       .then((configObject) => {
         if (dmCache) {
           return dmCache.getEntries(modelName, configObject);
+        }
+        if (SDK) {
+          return datamanager.entryList(modelName, configObject);
         }
         return datamanager.model(modelName).entryList(configObject);
       })
       .then((entryList) => {
         if (!('dmCacheHitFrom' in entryList)) {
-          return entryList.entries.map(entry => entry.value);
+          return SDK ? entryList : entryList.entries.map(entry => entry.value);
+        }
+        if (SDK) {
+          return entryList.map(entry => Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
         }
         return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
       });
@@ -148,12 +174,12 @@ function setupDatamanager(config) {
       if (kwargs && typeof kwargs === 'object' && 'ignoreErrors' in kwargs && kwargs.ignoreErrors) {
         return callback(null, null);
       }
-      return callback(new Error(e.title))
+      return callback(new Error(e.title));
     });
   }
 
   function filterLinkedEntryTitle(entry, field) {
-    const relations = entry['_links'][`${datamanager.id}:${entry._modelTitle}/${field}`];
+    const relations = entry._links[`${SDK ? datamanager.shortID : datamanager.id}:${entry._modelTitle}/${field}`];
     if (!Array.isArray(relations)) {
       return entry;
     }
@@ -175,9 +201,7 @@ function setupDatamanager(config) {
       }
       return loadFromDataManagerOrCache(model, 'entries', configObject);
     })
-    .then(result => {
-      return result;
-    });
+    .then((result) => result);
   }
 
   let templateLoaderEmitter;
@@ -200,7 +224,7 @@ function setupDatamanager(config) {
         let [templateType, ...entryID] = nameParts;
         entryID = entryID.join('-');
         if (!config.dynamicTemplates || !config.dynamicTemplates[templateType]) {
-          throw new Error(`dynamic templates '${templateType}' not defined`)
+          throw new Error(`dynamic templates '${templateType}' not defined`);
         }
         return loadFromDataManagerOrCache(config.dynamicTemplates[templateType].model, 'entry', entryID)
         .then(template => ({
@@ -211,14 +235,14 @@ function setupDatamanager(config) {
       `,
           noCache: config.disableTemplateCache,
         }))
-        .catch(error => {
+        .catch((error) => {
           if (error.status === 404) {
             throw new Error(`template with id ${entryID} not found.`);
           }
           throw error;
         });
       })
-      .then((result) => callback(null, result))
+      .then(result => callback(null, result))
       .catch(callback);
     },
   });
@@ -239,12 +263,10 @@ function setupDatamanager(config) {
   return {
     load(toLoad) {
       const results = {};
-      return Promise.all(Object.keys(toLoad).map((key) => {
-        return loadData(toLoad[key])
+      return Promise.all(Object.keys(toLoad).map((key) => loadData(toLoad[key])
         .then((data) => {
           results[key] = data;
-        });
-      }))
+        })))
       .then(() => results);
     },
     loadFromDataManagerOrCache,

@@ -84,6 +84,7 @@ publicURL: https://www.example.com
 datamanagerURL: https://datamanager.entrecode.de/api/00000000
 datamanagerRootURL: https://datamanager.entrecode.de
 shortID: 00000000
+useSDK: true # set if ec.sdk should be used instead of datamanager.js
 dataManagerID: f7bc72b0-9883-4e5b-b17d-d1ff139c3433
 searchURL: https://search.entrecode.de
 locale: de                # for date/time formatting
@@ -138,8 +139,8 @@ are available for you to use. Example: `cache.middleware(60 * 60, cache.PRIVATE)
 Same as the middleware, but not as middleware. Just give the response object to set the header to.
 
 ### `datamanager` export
-Some optimized methods to load data from [ec.datamanger](https://www.npmjs.com/package/ec.datamanager),
-but with in-memory caching. When the Data Manager integration is disabled this export is `false`.
+Some optimized methods to load data from [ec.datamanger](https://www.npmjs.com/package/ec.datamanager) or [ec.sdk](https://www.npmjs.com/package/ec.sdk),
+but with in-memory caching. When the Data Manager integration is disabled this export is `false`. Set `config.useSDK` to true to enable ec.sdk.
 
 #### datamanager.load(json)
 The argument `json` is expected to be an object with arbitrary keys and values that are objects.
@@ -147,7 +148,8 @@ Those objects need to have the property `model` which is the title of the model 
 If a property `entryID` is given, a single entry is loaded. Else, you may use the properties `size`, `page`, `sort` and `filter` 
 as described in the [Data Manager SDK Documentation](https://www.npmjs.com/package/ec.datamanager#entriesoptionsentrylistoptions).
 The function returns the single entry if `entryID` is given, or *always* an Array of entries otherwise. (This is different from normal SDK behavior.)
-The properties are directly inside the returned entries (no `value` property as in the SDK). 
+The properties are directly inside the returned entries (no `value` property as in datamanager.js). 
+If `config.useSDK` is set, the `filter` property is omitted because filters can be directly assigned; and the lists are complete sdk `EntryList`s.
 Note that the date you try to load needs to be publicly available (i.e. needs a public get policy).
 
 There is also da Nunjucks Template loader that allows loading templates from Data Manager.
