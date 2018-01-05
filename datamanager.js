@@ -39,12 +39,20 @@ function setupDatamanager(config) {
       return Promise.resolve(args)
       .then(([{ size, page, sort, filter, fields }]) => {
         if (SDK) {
-          return Object.assign({
-            size,
-            page,
-            sort,
-            _fields: fields,
-          }, filter);
+          const config = {};
+          if (size) {
+            config.size = size;
+          }
+          if (page) {
+            config.page = page;
+          }
+          if (sort) {
+            config.sort = sort;
+          }
+          if (fields) {
+            config._fields = fields;
+          }
+          return Object.assign(config, filter);
         }
         return { size, page, sort, filter, fields };
       })
