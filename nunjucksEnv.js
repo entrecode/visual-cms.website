@@ -65,7 +65,6 @@ function setupNunjucksEnv(config, datamanager, options) {
     .filter(extension => extension && 'name' in extension && 'ExtensionClass' in extension)
     .forEach(extension => nunjucksEnv.addExtension(extension.name, new extension.ExtensionClass()));
   } catch (extensionsDirDoesNotExistError) {
-    console.error(extensionsDirDoesNotExistError.message);
     // do nothing. If no extensions directory is there, we don't load any. Simple as that.
   }
 
