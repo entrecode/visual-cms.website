@@ -3,8 +3,6 @@ const cacheManager = require('cache-manager');
 const nunjucks = require('nunjucks');
 const { PublicAPI } = require('ec.sdk');
 
-let dmCache;
-
 function setupDatamanager(config) {
   const memoryCache = cacheManager.caching({
     store: 'memory',
@@ -14,6 +12,7 @@ function setupDatamanager(config) {
 
   const SDK = !!config.useSDK;
   let datamanager;
+  let dmCache;
 
   if (SDK) {
     datamanager = new PublicAPI(config.datamanagerURL);
