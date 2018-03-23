@@ -4,53 +4,66 @@ const apiMap = new Map();
 
 const helper = {
   negotiateAsset: (asset, size, image = false, thumb = false) => {
-    let f = JSON.parse(JSON.stringify(asset.files));
-
-    // for file url pic fist file and return - not for images
-    if (!image && !thumb && asset.type !== 'image') {
-      return f[0].url;
-    }
-
-    const first = f[0];
-    // remove image files we have no resolution for (image/svg+xml; fix for CMS-1091)
-    f = f.filter(file => file.resolution);
-    if (f.length === 0) { // if no file is left pick first of original data
-      return first.url;
-    }
-    f.sort((left, right) => { // sort by size descending
-      const leftMax = Math.max(left.resolution.height, left.resolution.width);
-      const rightMax = Math.max(right.resolution.height, right.resolution.width);
-      if (leftMax < rightMax) {
-        return 1;
+    if ('file' in asset) {
+      // for file url pic fist file and return - not for images
+      if (!image && !thumb && asset.type !== 'image') {
+        return file.url;
       }
-      if (leftMax > rightMax) {
-        return -1;
-      }
-      return 0;
-    });
-    let imageFiles = f.filter((file) => {
       if (thumb) {
-        return file.url.indexOf('_thumb') !== -1; // is thumbnail
+        return asset.thumbnails[0].url;
       }
-      return file.url.indexOf('_thumb') === -1; // is not a thumbnail
-    });
-    if (!imageFiles || imageFiles.length === 0) {
-      imageFiles = f;
+      return file.url;
+      // todo different sizes
     }
-    const largest = imageFiles[0];
-    if (size) {
-      // remove all image resolutions that are too small
-      imageFiles = imageFiles
-      .filter(file => file.resolution.height >= size || file.resolution.width >= size)
-      // choose smallest image of all that are greater than size parameter
-      .slice(-1);
-    }
+    if ('files' in asset) { // legacy asset logic
+      let f = JSON.parse(JSON.stringify(asset.files));
 
-    if (imageFiles.length > 0) { // if all is good, we have an image now
-      return imageFiles[0].url;
+      // for file url pic fist file and return - not for images
+      if (!image && !thumb && asset.type !== 'image') {
+        return f[0].url;
+      }
+
+      const first = f[0];
+      // remove image files we have no resolution for (image/svg+xml; fix for CMS-1091)
+      f = f.filter(file => file.resolution);
+      if (f.length === 0) { // if no file is left pick first of original data
+        return first.url;
+      }
+      f.sort((left, right) => { // sort by size descending
+        const leftMax = Math.max(left.resolution.height, left.resolution.width);
+        const rightMax = Math.max(right.resolution.height, right.resolution.width);
+        if (leftMax < rightMax) {
+          return 1;
+        }
+        if (leftMax > rightMax) {
+          return -1;
+        }
+        return 0;
+      });
+      let imageFiles = f.filter((file) => {
+        if (thumb) {
+          return file.url.indexOf('_thumb') !== -1; // is thumbnail
+        }
+        return file.url.indexOf('_thumb') === -1; // is not a thumbnail
+      });
+      if (!imageFiles || imageFiles.length === 0) {
+        imageFiles = f;
+      }
+      const largest = imageFiles[0];
+      if (size) {
+        // remove all image resolutions that are too small
+        imageFiles = imageFiles
+        .filter(file => file.resolution.height >= size || file.resolution.width >= size)
+        // choose smallest image of all that are greater than size parameter
+        .slice(-1);
+      }
+
+      if (imageFiles.length > 0) { // if all is good, we have an image now
+        return imageFiles[0].url;
+      }
+      // if the requested size is larger than the original image, we take the largest possible one
+      return largest.url;
     }
-    // if the requested size is larger than the original image, we take the largest possible one
-    return largest.url;
   },
 
   negotiateEmbedded: (entry, field, size, image = false, thumb = false) => {
