@@ -7,13 +7,37 @@ const helper = {
     if ('file' in asset) {
       // for file url pic fist file and return - not for images
       if (!image && !thumb && asset.type !== 'image') {
-        return file.url;
+        return asset.file.url;
       }
       if (thumb) {
+        if (size) {
+          const f = asset.thumbnails.find(t => t.dimension === size); 
+          if (f) {
+            return f.url;
+          } else {
+            if ('getImageThumbUrl' in asset) {
+              return asset.getImageThumbUrl(size); 
+            }
+            return asset._links['ec:dm-asset/thumbnail'][0].href.replace('{size}', size);
+          }
+        }
+        return asset.thumbnails[0].url;
+      }
+      if (image) {
+        if (size) {
+          const f = asset.fileVariants.find(v => Math.max(v.resolution.width, v.resolution.height) === size); 
+          if (f) {
+            return f.url;
+          } else {
+            if ('getImageUrl' in asset) {
+              return asset.getImageUrl(size); 
+            }
+            return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
+          }
+        }
         return asset.thumbnails[0].url;
       }
       return file.url;
-      // todo different sizes
     }
     if ('files' in asset) { // legacy asset logic
       let f = JSON.parse(JSON.stringify(asset.files));
