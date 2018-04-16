@@ -146,6 +146,10 @@ const helper = {
       console.warn('visual-cms.website: assetHelper called with undefined');
       return undefined;
     }
+    if (input === null) {
+      console.warn('visual-cms.website: assetHelper called with null');
+      return null;
+    }
     if (Array.isArray(input)) {
       return Promise.all(input.map(i =>
         helper.negotiate(dmConfig, i, field, size, image, thumb)));
