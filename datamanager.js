@@ -28,7 +28,7 @@ function setupDatamanager(config) {
           return dmCache.getEntry(modelName, entryID, fields, levels);
         }
         if (SDK) {
-          return datamanager.entry(modelName, entryID, { levels, fields });
+          return datamanager.entry(modelName, entryID, { _levels: levels, fields });
         }
         return datamanager.model(modelName).entry(entryID, levels, fields);
       })
