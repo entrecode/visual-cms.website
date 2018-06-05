@@ -76,7 +76,7 @@ function setupDatamanager(config) {
                   }
                 }
               },
-              map: this.items.map,
+              map: cachedObject.items.map.bind(cachedObject.items),
             });
           });        }
         if (SDK) {
