@@ -78,7 +78,8 @@ function setupDatamanager(config) {
               },
               map: cachedObject.items.map.bind(cachedObject.items),
             });
-          });        }
+          });        
+        }
         if (SDK) {
           return datamanager.entryList(modelName, configObject);
         }
