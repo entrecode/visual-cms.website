@@ -57,8 +57,28 @@ function setupDatamanager(config) {
       })
       .then((configObject) => {
         if (dmCache) {
-          return dmCache.getEntries(modelName, configObject);
-        }
+          return dmCache.getEntries(modelName, configObject)
+          .then((cachedObject) => {
+            if (!SDK) {
+              return cachedObject;
+            }
+            return Object.assign({}, cachedObject, {
+              index: 0,
+              [Symbol.iterator]() {
+                return {
+                  next: () => {
+                    if (this.index < this.count) {
+                      return { value: this.items[this.index++], done: false };
+                    } else {
+                      this.index = 0;
+                      return { done: true };
+                    }
+                  }
+                }
+              },
+              map: this.items.map,
+            });
+          });        }
         if (SDK) {
           return datamanager.entryList(modelName, configObject);
         }
@@ -69,7 +89,8 @@ function setupDatamanager(config) {
           return SDK ? entryList : entryList.entries.map(entry => entry.value);
         }
         if (SDK) {
-          return entryList.map(entry => Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
+          entryList.items = entryList.items.map(entry => Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
+          return entryList;
         }
         return entryList.entries.map(entry => Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
       });
