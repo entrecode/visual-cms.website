@@ -22,7 +22,7 @@ module.exports = (projectName, basedir, disableDataManager = false) => {
     },
   } : {};
   const csp = new CSP();
-  const expressApp = libExpress(config, csp);
+  const { app, server, errorHandler } = libExpress(config, csp);
   let datamanager;
   if (disableDataManager) {
     datamanager = false;
@@ -31,22 +31,22 @@ module.exports = (projectName, basedir, disableDataManager = false) => {
   }
   const nunjucksEnv = libNunjucksEnv(config, datamanager, options);
 
-  nunjucksEnv.express(expressApp);
+  nunjucksEnv.express(app);
 
   const router = expressPromiseRouter();
-  expressApp.use(router);
+  app.use(router);
+  app.use(errorHandler);
 
   const instance = {
     config,
-    express: expressApp,
+    express: app,
+    server,
     router,
     csp,
     datamanager,
     nunjucksEnv,
     cache,
-    newNunjucksEnv: () => {
-      return libNunjucksEnv(config, datamanager, options);
-    },
+    newNunjucksEnv: () => libNunjucksEnv(config, datamanager, options),
   };
 
   instances.set(projectName, instance);
