@@ -4,6 +4,7 @@ const apiMap = new Map();
 
 const helper = {
   negotiateAsset: (asset, size, image = false, thumb = false) => {
+    // assets neue
     if ('file' in asset) {
       // for file url pic fist file and return - not for images
       if (!image && !thumb && asset.type !== 'image') {
@@ -11,35 +12,34 @@ const helper = {
       }
       if (thumb) {
         if (size) {
-          const f = asset.thumbnails.find(t => t.dimension === size); 
+          const f = asset.thumbnails.find(t => t.dimension === size);
           if (f) {
             return f.url;
-          } else {
-            if ('getImageThumbUrl' in asset) {
-              return asset.getImageThumbUrl(size); 
-            }
-            return asset._links['ec:dm-asset/thumbnail'][0].href.replace('{size}', size);
           }
+          if ('getImageThumbUrl' in asset) {
+            return asset.getImageThumbUrl(size);
+          }
+          return asset._links['ec:dm-asset/thumbnail'][0].href.replace('{size}', size);
         }
         return asset.thumbnails[0].url;
       }
       if (image) {
         if (size) {
-          const f = asset.fileVariants.find(v => Math.max(v.resolution.width, v.resolution.height) === size); 
+          const f = asset.fileVariants.find(v => Math.max(v.resolution.width, v.resolution.height) === size);
           if (f) {
             return f.url;
-          } else {
-            if ('getImageUrl' in asset) {
-              return asset.getImageUrl(size); 
-            }
-            return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
           }
+          if ('getImageUrl' in asset) {
+            return asset.getImageUrl(size);
+          }
+          return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
         }
         return asset.thumbnails[0].url;
       }
-      return file.url;
     }
-    if ('files' in asset) { // legacy asset logic
+    
+    // legacy asset logic
+    if ('files' in asset) {
       let f = JSON.parse(JSON.stringify(asset.files));
 
       // for file url pic fist file and return - not for images
@@ -77,9 +77,9 @@ const helper = {
       if (size) {
         // remove all image resolutions that are too small
         imageFiles = imageFiles
-        .filter(file => file.resolution.height >= size || file.resolution.width >= size)
-        // choose smallest image of all that are greater than size parameter
-        .slice(-1);
+          .filter(file => file.resolution.height >= size || file.resolution.width >= size)
+          // choose smallest image of all that are greater than size parameter
+          .slice(-1);
       }
 
       if (imageFiles.length > 0) { // if all is good, we have an image now
@@ -141,28 +141,28 @@ const helper = {
   },
 
   negotiate: (dmConfig, input, field, size, image, thumb) => Promise.resolve()
-  .then(() => {
-    if (input === undefined) {
-      console.warn('visual-cms.website: assetHelper called with undefined');
-      return undefined;
-    }
-    if (input === null) {
-      console.warn('visual-cms.website: assetHelper called with null');
-      return null;
-    }
-    if (Array.isArray(input)) {
-      return Promise.all(input.map(i =>
-        helper.negotiate(dmConfig, i, field, size, image, thumb)));
-    } else if (typeof input === 'object' && 'assetID' in input) {
-      return helper.negotiateAsset(input, size, image, thumb);
-    } else if (typeof input === 'object' && '_embedded' in input) {
-      return helper.negotiateEmbedded(input, field, size, image, thumb);
-    } else if (typeof input === 'string') {
-      return helper.negotiateRemote(dmConfig, input, size, image, thumb);
-    }
+    .then(() => {
+      if (input === undefined) {
+        console.warn('visual-cms.website: assetHelper called with undefined');
+        return undefined;
+      }
+      if (input === null) {
+        console.warn('visual-cms.website: assetHelper called with null');
+        return null;
+      }
+      if (Array.isArray(input)) {
+        return Promise.all(input.map(i =>
+          helper.negotiate(dmConfig, i, field, size, image, thumb)));
+      } else if (typeof input === 'object' && 'assetID' in input) {
+        return helper.negotiateAsset(input, size, image, thumb);
+      } else if (typeof input === 'object' && '_embedded' in input) {
+        return helper.negotiateEmbedded(input, field, size, image, thumb);
+      } else if (typeof input === 'string') {
+        return helper.negotiateRemote(dmConfig, input, size, image, thumb);
+      }
 
-    throw new Error('cannot handle input type');
-  }),
+      throw new Error('cannot handle input type');
+    }),
 };
 
 function fileFilter(input, field, callback) {
@@ -172,8 +172,8 @@ function fileFilter(input, field, callback) {
   }
 
   helper.negotiate(this.env.globals._dmConfig, input, field)
-  .then(res => callback(null, res))
-  .catch(callback);
+    .then(res => callback(null, res))
+    .catch(callback);
 }
 
 function imageFilter(input, field, size, callback) {
@@ -190,8 +190,8 @@ function imageFilter(input, field, size, callback) {
   }
 
   helper.negotiate(this.env.globals._dmConfig, input, field, size, true)
-  .then(res => callback(null, res))
-  .catch(callback);
+    .then(res => callback(null, res))
+    .catch(callback);
 }
 
 function thumbFilter(input, field, size, callback) {
@@ -208,8 +208,8 @@ function thumbFilter(input, field, size, callback) {
   }
 
   helper.negotiate(this.env.globals._dmConfig, input, field, size, true, true)
-  .then(res => callback(null, res))
-  .catch(callback);
+    .then(res => callback(null, res))
+    .catch(callback);
 }
 
 module.exports = {

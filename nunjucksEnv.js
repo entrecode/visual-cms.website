@@ -30,10 +30,10 @@ function setupNunjucksEnv(config, datamanager, options) {
 
   nunjucksEnv.xss = {
     whiteList: Object.assign({}, xssWhitelist),
-    onTag: () => {},
-    onTagAttr: () => {},
-    onIgnoreTag: () => {},
-    onIgnoreTagAttr: () => {},
+    onTag: () => { },
+    onTagAttr: () => { },
+    onIgnoreTag: () => { },
+    onIgnoreTagAttr: () => { },
     xss,
   };
 
@@ -61,9 +61,11 @@ function setupNunjucksEnv(config, datamanager, options) {
     fs.accessSync(extensionsPath, fs.constants.R_OK);
     const extensions = requireAll(extensionsPath);
     Object.keys(extensions)
-    .map(key => extensions[key](nunjucks))
-    .filter(extension => extension && 'name' in extension && 'ExtensionClass' in extension)
-    .forEach(extension => nunjucksEnv.addExtension(extension.name, new extension.ExtensionClass()));
+      .map(key => extensions[key](nunjucks))
+      .filter(extension =>
+        extension && 'name' in extension && 'ExtensionClass' in extension)
+      .forEach(extension =>
+        nunjucksEnv.addExtension(extension.name, new extension.ExtensionClass()));
   } catch (extensionsDirDoesNotExistError) {
     // do nothing. If no extensions directory is there, we don't load any. Simple as that.
   }

@@ -15,16 +15,15 @@ const manifestSymbol = Symbol('manifest-src');
  * A Content Security Policy
  */
 class CSP {
-
-   get NONE() {
+  get NONE() {
     return '\'none\'';
   }
 
-   get UNSAFEINLINE() {
+  get UNSAFEINLINE() {
     return '\'unsafe-inline\'';
   }
 
-   get SELF() {
+  get SELF() {
     return '\'self\'';
   }
 
@@ -152,14 +151,14 @@ class CSP {
       'connect-src',
       'manifest-src',
     ]
-    .map(key => `${key} ${this[key].join(' ')}`)
-    .join('; ');
+      .map(key => `${key} ${this[key].join(' ')}`)
+      .join('; ');
+
     res.header('Content-Security-Policy', contentSecurityPolicy);
     res.header('X-Content-Security-Policy', contentSecurityPolicy);
     res.header('X-WebKit-CSP', contentSecurityPolicy);
     next();
   }
-
 }
 
 module.exports = CSP;
