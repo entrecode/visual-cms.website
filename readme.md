@@ -2,6 +2,8 @@
 
 Visual CMS Website Library. By entrecode.
 
+Since version 0.8.0 visual-cms.website is using for running without ec.render. Use the yoman generator to create your project, this will contain everything you need to get your dynamic-website running.
+
 This library gives you all you need to quickly setup a dynamically rendered 
 [Nunjucks](https://mozilla.github.io/nunjucks/) website for usage with *ec.render*.
 
