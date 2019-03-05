@@ -1,6 +1,6 @@
 {
   "name": "visual-cms.website",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Visual CMS Website Library. By entrecode.",
   "main": "index.js",
   "directories": {
