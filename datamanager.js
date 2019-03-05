@@ -14,10 +14,11 @@ function setupDatamanager(config) {
   let dmCache;
 
   if (SDK) {
-    datamanager = new PublicAPI(config.datamanagerURL);
+    datamanager = new PublicAPI(config.shortID, { environment: config.env, noCookie: true });
   } else {
     const Datamanager = require('ec.datamanager');
     datamanager = new Datamanager({ url: config.datamanagerURL });
+
   }
 
   function loadFromDataManagerOrCache(modelName, requestType, ...args) {
