@@ -1,4 +1,3 @@
-const Datamanager = require('ec.datamanager');
 const cacheManager = require('cache-manager');
 const nunjucks = require('nunjucks');
 const { PublicAPI } = require('ec.sdk');
@@ -17,6 +16,7 @@ function setupDatamanager(config) {
   if (SDK) {
     datamanager = new PublicAPI(config.datamanagerURL);
   } else {
+    const Datamanager = require('ec.datamanager');
     datamanager = new Datamanager({ url: config.datamanagerURL });
   }
 
@@ -32,17 +32,15 @@ function setupDatamanager(config) {
           }
           return datamanager.model(modelName).entry(entryID, levels, fields);
         })
-        .then(entry => Object.assign({}, SDK ? entry : entry.value, { dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null }));
+        .then((entry) =>
+          Object.assign({}, SDK ? entry : entry.value, {
+            dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null,
+          }),
+        );
     }
     if (requestType === 'entries') {
       return Promise.resolve(args)
-        .then(([{
-          size,
-          page,
-          sort,
-          filter,
-          fields,
-        }]) => {
+        .then(([{ size, page, sort, filter, fields }]) => {
           if (SDK) {
             const config = {};
             if (size) {
@@ -69,27 +67,26 @@ function setupDatamanager(config) {
         })
         .then((configObject) => {
           if (dmCache) {
-            return dmCache.getEntries(modelName, configObject)
-              .then((cachedObject) => {
-                if (!SDK) {
-                  return cachedObject;
-                }
-                return Object.assign({}, cachedObject, {
-                  index: 0,
-                  [Symbol.iterator]() {
-                    return {
-                      next: () => {
-                        if (this.index < this.count) {
-                          return { value: this.items[this.index++], done: false };
-                        }
-                        this.index = 0;
-                        return { done: true };
-                      },
-                    };
-                  },
-                  map: cachedObject.items.map.bind(cachedObject.items),
-                });
+            return dmCache.getEntries(modelName, configObject).then((cachedObject) => {
+              if (!SDK) {
+                return cachedObject;
+              }
+              return Object.assign({}, cachedObject, {
+                index: 0,
+                [Symbol.iterator]() {
+                  return {
+                    next: () => {
+                      if (this.index < this.count) {
+                        return { value: this.items[this.index++], done: false };
+                      }
+                      this.index = 0;
+                      return { done: true };
+                    },
+                  };
+                },
+                map: cachedObject.items.map.bind(cachedObject.items),
               });
+            });
           }
           if (SDK) {
             return datamanager.entryList(modelName, configObject);
@@ -98,15 +95,17 @@ function setupDatamanager(config) {
         })
         .then((entryList) => {
           if (!('dmCacheHitFrom' in entryList)) {
-            return SDK ? entryList : entryList.entries.map(entry => entry.value);
+            return SDK ? entryList : entryList.entries.map((entry) => entry.value);
           }
           if (SDK) {
-            entryList.items = entryList.items.map(entry =>
-              Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
+            entryList.items = entryList.items.map((entry) =>
+              Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }),
+            );
             return entryList;
           }
-          return entryList.entries.map(entry =>
-            Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }));
+          return entryList.entries.map((entry) =>
+            Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }),
+          );
         });
     }
     throw new Error(`unknown requestType: '${requestType}'`);
@@ -127,8 +126,8 @@ function setupDatamanager(config) {
         }
         return assetID;
       })
-      .then(id => datamanager.getFileUrl(id))
-      .then(url => callback(null, url))
+      .then((id) => datamanager.getFileUrl(id))
+      .then((url) => callback(null, url))
       .catch((error) => {
         if (error.status === 404) {
           console.error(`FileURL not found: ${assetID}`);
@@ -158,18 +157,23 @@ function setupDatamanager(config) {
         if (typeof minSize !== 'number') {
           minSize = null;
         }
-        memoryCache.wrap(id + (minSize || ''), (cacheCallback) => {
-          datamanager.getImageUrl(id, minSize)
-            .then(url => cacheCallback(null, url))
-            .catch((error) => {
-              if (error.status === 404) {
-                console.error(`ImageURL not found: ${id}`);
-              } else {
-                console.error(error.message);
-              }
-              cacheCallback();
-            });
-        }, callback);
+        memoryCache.wrap(
+          id + (minSize || ''),
+          (cacheCallback) => {
+            datamanager
+              .getImageUrl(id, minSize)
+              .then((url) => cacheCallback(null, url))
+              .catch((error) => {
+                if (error.status === 404) {
+                  console.error(`ImageURL not found: ${id}`);
+                } else {
+                  console.error(error.message);
+                }
+                cacheCallback();
+              });
+          },
+          callback,
+        );
       })
       .catch(() => callback());
   }
@@ -193,25 +197,30 @@ function setupDatamanager(config) {
         if (typeof minSize !== 'number') {
           minSize = null;
         }
-        memoryCache.wrap(id + (minSize || ''), (cacheCallback) => {
-          datamanager.getImageThumbUrl(id, minSize)
-            .then(url => cacheCallback(null, url))
-            .catch((error) => {
-              if (error.status === 404) {
-                console.error(`ImageThumbURL not found: ${id}`);
-              } else {
-                console.error(error.message);
-              }
-              cacheCallback();
-            });
-        }, callback);
+        memoryCache.wrap(
+          id + (minSize || ''),
+          (cacheCallback) => {
+            datamanager
+              .getImageThumbUrl(id, minSize)
+              .then((url) => cacheCallback(null, url))
+              .catch((error) => {
+                if (error.status === 404) {
+                  console.error(`ImageThumbURL not found: ${id}`);
+                } else {
+                  console.error(error.message);
+                }
+                cacheCallback();
+              });
+          },
+          callback,
+        );
       })
       .catch(() => callback());
   }
 
   function filterEntry(entryID, model, levels, kwargs = levels, callback = kwargs) {
     loadFromDataManagerOrCache(model, 'entry', entryID, levels && levels < 4 ? levels : null)
-      .then(entry => callback(null, entry))
+      .then((entry) => callback(null, entry))
       .catch((e) => {
         if (kwargs && typeof kwargs === 'object' && 'ignoreErrors' in kwargs && kwargs.ignoreErrors) {
           return callback(null, null);
@@ -225,7 +234,7 @@ function setupDatamanager(config) {
     if (!Array.isArray(relations)) {
       return entry;
     }
-    const titles = relations.map(relation => relation.title);
+    const titles = relations.map((relation) => relation.title);
     if (titles.length > 1) {
       return titles;
     }
@@ -236,13 +245,18 @@ function setupDatamanager(config) {
     if (!configObject.model) {
       return Promise.reject(new Error('missing model property'));
     }
-    return Promise.resolve(configObject.model)
-      .then((model) => {
-        if (configObject.entryID) {
-          return loadFromDataManagerOrCache(model, 'entry', configObject.entryID, configObject.levels, configObject.fields);
-        }
-        return loadFromDataManagerOrCache(model, 'entries', configObject);
-      });
+    return Promise.resolve(configObject.model).then((model) => {
+      if (configObject.entryID) {
+        return loadFromDataManagerOrCache(
+          model,
+          'entry',
+          configObject.entryID,
+          configObject.levels,
+          configObject.fields,
+        );
+      }
+      return loadFromDataManagerOrCache(model, 'entries', configObject);
+    });
   }
 
   let templateLoaderEmitter;
@@ -257,7 +271,7 @@ function setupDatamanager(config) {
     async: true,
     getSource(name, callback) {
       return Promise.resolve(name)
-        .then(n => n.split('-'))
+        .then((n) => n.split('-'))
         .then((nameParts) => {
           if (nameParts.length < 2) {
             throw new Error(`invalid template name '${name}': should be of the form xxx-entryID`);
@@ -269,7 +283,7 @@ function setupDatamanager(config) {
             throw new Error(`dynamic templates '${templateType}' not defined`);
           }
           return loadFromDataManagerOrCache(config.dynamicTemplates[templateType].model, 'entry', entryID)
-            .then(template => ({
+            .then((template) => ({
               path: name,
               src: `
         <style>${template.style}</style>
@@ -284,7 +298,7 @@ function setupDatamanager(config) {
               throw error;
             });
         })
-        .then(result => callback(null, result))
+        .then((result) => callback(null, result))
         .catch(callback);
     },
   });
@@ -293,7 +307,7 @@ function setupDatamanager(config) {
     dmCache = dmCacheInstance;
     dmCache.eventEmitter.on('entryUpdated', ({ model, entryID }) => {
       const dynamicTemplateModels = Object.keys(config.dynamicTemplates)
-        .map(templateType => ({ [config.dynamicTemplates[templateType].model]: templateType }))
+        .map((templateType) => ({ [config.dynamicTemplates[templateType].model]: templateType }))
         .reduce((a, b) => Object.assign(a, b), {});
       if (model in dynamicTemplateModels) {
         console.log(`emitted nunjucks update ${dynamicTemplateModels[model]}-${entryID}`);
@@ -305,12 +319,13 @@ function setupDatamanager(config) {
   return {
     load(toLoad) {
       const results = {};
-      return Promise.all(Object.keys(toLoad)
-        .map(key => loadData(toLoad[key])
-          .then((data) => {
+      return Promise.all(
+        Object.keys(toLoad).map((key) =>
+          loadData(toLoad[key]).then((data) => {
             results[key] = data;
-          })))
-        .then(() => results);
+          }),
+        ),
+      ).then(() => results);
     },
     loadFromDataManagerOrCache,
     filterEntry,
