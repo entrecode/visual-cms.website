@@ -39,7 +39,16 @@ function setupExpress(config, csp) {
 
     // and cors <3
     res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Origin', config.publicURL);
+    if (
+      config.corsRoutes &&
+      Array.isArray(config.corsRoutes) &&
+      config.corsRoutes.length &&
+      config.corsRoutes.find((route) => req.path.startsWith(route))
+    ) {
+      res.header('Access-Control-Allow-Origin', '*');
+    } else {
+      res.header('Access-Control-Allow-Origin', config.publicURL);
+    }
     res.header('Access-Control-Expose-Headers', 'Allow');
     if (req.get('Access-Control-Request-Headers')) {
       res.header('Access-Control-Allow-Headers', req.get('Access-Control-Request-Headers'));
@@ -72,9 +81,11 @@ function setupExpress(config, csp) {
 
   // TODO ec.logger middleware
 
-  app.use(express.static(path.resolve(config.basedir, './static'), {
-    maxAge: `${365.25 / 12} days`, // 1 month
-  }));
+  app.use(
+    express.static(path.resolve(config.basedir, './static'), {
+      maxAge: `${365.25 / 12} days`, // 1 month
+    }),
+  );
 
   function errorHandler(err, req, res, next) {
     // TODO ec.error handler?
