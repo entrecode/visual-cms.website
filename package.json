@@ -14,20 +14,20 @@
   "author": "entrecode GmbH",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "cache-manager": "^2.9.0",
-    "compression": "^1.7.3",
-    "config": "^3.0.1",
+    "body-parser": "^1.19.0",
+    "cache-manager": "^2.10.0",
+    "compression": "^1.7.4",
+    "config": "^3.2.2",
     "cookie-parser": "^1.4.4",
-    "ec.sdk": "^0.21.2",
-    "express": "^4.16.4",
+    "ec.sdk": "^0.21.14",
+    "express": "^4.17.1",
     "express-promise-router": "^3.0.3",
-    "js-yaml": "^3.12.2",
-    "moment-timezone": "^0.5.23",
-    "nunjucks": "^3.1.7",
+    "js-yaml": "^3.13.1",
+    "moment-timezone": "^0.5.26",
+    "nunjucks": "^3.2.0",
     "require-all": "^3.0.0",
     "speakingurl": "^14.0.1",
     "visual-cms.core": "^0.2.1",
-    "xss": "^1.0.3"
+    "xss": "^1.0.6"
   }
 }
