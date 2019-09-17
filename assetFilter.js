@@ -12,7 +12,7 @@ const helper = {
       }
       if (thumb) {
         if (size) {
-          const f = asset.thumbnails.find(t => t.dimension === size);
+          const f = asset.thumbnails.find((t) => t.dimension === size);
           if (f) {
             return f.url;
           }
@@ -25,7 +25,7 @@ const helper = {
       }
       if (image) {
         if (size) {
-          const f = asset.fileVariants.find(v => Math.max(v.resolution.width, v.resolution.height) === size);
+          const f = asset.fileVariants.find((v) => Math.max(v.resolution.width, v.resolution.height) === size);
           if (f) {
             return f.url;
           }
@@ -34,10 +34,10 @@ const helper = {
           }
           return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
         }
-        return asset.thumbnails[0].url;
+        return asset.fileVariants[0].url;
       }
     }
-    
+
     // legacy asset logic
     if ('files' in asset) {
       let f = JSON.parse(JSON.stringify(asset.files));
@@ -49,11 +49,13 @@ const helper = {
 
       const first = f[0];
       // remove image files we have no resolution for (image/svg+xml; fix for CMS-1091)
-      f = f.filter(file => file.resolution);
-      if (f.length === 0) { // if no file is left pick first of original data
+      f = f.filter((file) => file.resolution);
+      if (f.length === 0) {
+        // if no file is left pick first of original data
         return first.url;
       }
-      f.sort((left, right) => { // sort by size descending
+      f.sort((left, right) => {
+        // sort by size descending
         const leftMax = Math.max(left.resolution.height, left.resolution.width);
         const rightMax = Math.max(right.resolution.height, right.resolution.width);
         if (leftMax < rightMax) {
@@ -77,12 +79,13 @@ const helper = {
       if (size) {
         // remove all image resolutions that are too small
         imageFiles = imageFiles
-          .filter(file => file.resolution.height >= size || file.resolution.width >= size)
+          .filter((file) => file.resolution.height >= size || file.resolution.width >= size)
           // choose smallest image of all that are greater than size parameter
           .slice(-1);
       }
 
-      if (imageFiles.length > 0) { // if all is good, we have an image now
+      if (imageFiles.length > 0) {
+        // if all is good, we have an image now
         return imageFiles[0].url;
       }
       // if the requested size is larger than the original image, we take the largest possible one
@@ -99,7 +102,7 @@ const helper = {
       throw new Error(`asset helper field parameter invalid: ${field}`);
     }
 
-    const embedKey = Object.keys(entry._embedded).find(k => k.indexOf(`/${field}/asset`) !== -1);
+    const embedKey = Object.keys(entry._embedded).find((k) => k.indexOf(`/${field}/asset`) !== -1);
 
     if (!embedKey) {
       throw new Error(`could not find asset ${field} in embedded of entry`);
@@ -108,7 +111,7 @@ const helper = {
     const asset = entry._embedded[embedKey];
     // if entry[field] is array it is an assets field, so return mapped
     if (Array.isArray(entry[field])) {
-      return asset.map(a => helper.negotiateAsset(a, size, image, thumb));
+      return asset.map((a) => helper.negotiateAsset(a, size, image, thumb));
     }
     // if embedded is array and we are here halfred did its magic, so return first element
     if (Array.isArray(asset)) {
@@ -140,8 +143,8 @@ const helper = {
     return api.getFileUrl(assetID);
   },
 
-  negotiate: (dmConfig, input, field, size, image, thumb) => Promise.resolve()
-    .then(() => {
+  negotiate: (dmConfig, input, field, size, image, thumb) =>
+    Promise.resolve().then(() => {
       if (input === undefined) {
         console.warn('visual-cms.website: assetHelper called with undefined');
         return undefined;
@@ -151,13 +154,15 @@ const helper = {
         return null;
       }
       if (Array.isArray(input)) {
-        return Promise.all(input.map(i =>
-          helper.negotiate(dmConfig, i, field, size, image, thumb)));
-      } else if (typeof input === 'object' && 'assetID' in input) {
+        return Promise.all(input.map((i) => helper.negotiate(dmConfig, i, field, size, image, thumb)));
+      }
+      if (typeof input === 'object' && 'assetID' in input) {
         return helper.negotiateAsset(input, size, image, thumb);
-      } else if (typeof input === 'object' && '_embedded' in input) {
+      }
+      if (typeof input === 'object' && '_embedded' in input) {
         return helper.negotiateEmbedded(input, field, size, image, thumb);
-      } else if (typeof input === 'string') {
+      }
+      if (typeof input === 'string') {
         return helper.negotiateRemote(dmConfig, input, size, image, thumb);
       }
 
@@ -171,8 +176,9 @@ function fileFilter(input, field, callback) {
     field = undefined;
   }
 
-  helper.negotiate(this.env.globals._dmConfig, input, field)
-    .then(res => callback(null, res))
+  helper
+    .negotiate(this.env.globals._dmConfig, input, field)
+    .then((res) => callback(null, res))
     .catch(callback);
 }
 
@@ -189,8 +195,9 @@ function imageFilter(input, field, size, callback) {
     size = undefined;
   }
 
-  helper.negotiate(this.env.globals._dmConfig, input, field, size, true)
-    .then(res => callback(null, res))
+  helper
+    .negotiate(this.env.globals._dmConfig, input, field, size, true)
+    .then((res) => callback(null, res))
     .catch(callback);
 }
 
@@ -207,8 +214,9 @@ function thumbFilter(input, field, size, callback) {
     size = undefined;
   }
 
-  helper.negotiate(this.env.globals._dmConfig, input, field, size, true, true)
-    .then(res => callback(null, res))
+  helper
+    .negotiate(this.env.globals._dmConfig, input, field, size, true, true)
+    .then((res) => callback(null, res))
     .catch(callback);
 }
 
