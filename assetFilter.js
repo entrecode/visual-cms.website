@@ -34,7 +34,7 @@ const helper = {
           }
           return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
         }
-        return asset.fileVariants[0].url;
+        return asset.file.url;
       }
     }
 
