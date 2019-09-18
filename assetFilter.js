@@ -19,7 +19,9 @@ const helper = {
           if ('getImageThumbUrl' in asset) {
             return asset.getImageThumbUrl(size);
           }
-          return asset._links['ec:dm-asset/thumbnail'][0].href.replace('{size}', size);
+          if (asset._links) {
+            return asset._links['ec:dm-asset/thumbnail'][0].href.replace('{size}', size);
+          }
         }
         return asset.thumbnails[0].url;
       }
@@ -32,7 +34,9 @@ const helper = {
           if ('getImageUrl' in asset) {
             return asset.getImageUrl(size);
           }
-          return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
+          if (asset._links) {
+            return asset._links['ec:dm-asset/file-variant'][0].href.replace('{size}', size);
+          }
         }
         return asset.file.url;
       }
