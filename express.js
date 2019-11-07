@@ -19,7 +19,12 @@ function setupExpress(config, csp) {
   const app = express();
   const server = http.createServer(app);
   server.listen(config.port, () =>
-    console.info(`${process.title} ${process.pid} started and listening on port ${server.address().port} (v.${packageJson.version})`)); // eslint-disable-line
+    console.info(
+      `${process.title} ${process.pid} started and listening on port ${server.address().port} (v.${
+        packageJson.version
+      })`
+    )
+  ); // eslint-disable-line
 
   app.set('x-powered-by', false);
   app.set('env', 'production');
@@ -39,13 +44,14 @@ function setupExpress(config, csp) {
 
     // and cors <3
     res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-    if (
-      config.corsRoutes &&
-      Array.isArray(config.corsRoutes) &&
-      config.corsRoutes.length &&
-      config.corsRoutes.find((route) => req.path.startsWith(route))
-    ) {
-      res.header('Access-Control-Allow-Origin', '*');
+    if (config.corsRoutes && Array.isArray(config.corsRoutes) && config.corsRoutes.length) {
+      if (config.corsRoutesAsRegExp && config.corsRoutes.find((r) => new RegExp(r).test(req.path))) {
+        res.header('Access-Control-Allow-Origin', '*');
+      } else if (config.corsRoutes.find((route) => req.path.startsWith(route))) {
+        res.header('Access-Control-Allow-Origin', '*');
+      } else {
+        res.header('Access-Control-Allow-Origin', config.publicURL);
+      }
     } else {
       res.header('Access-Control-Allow-Origin', config.publicURL);
     }
@@ -84,12 +90,12 @@ function setupExpress(config, csp) {
   app.use(
     express.static(path.resolve(config.basedir, './static'), {
       maxAge: `${365.25 / 12} days`, // 1 month
-    }),
+    })
   );
 
   function errorHandler(err, req, res, next) {
     // TODO ec.error handler?
-    console.error(err.stack);  // eslint-disable-line
+    console.error(err.stack); // eslint-disable-line
     try {
       // stop taking new requests.
       server.close();
