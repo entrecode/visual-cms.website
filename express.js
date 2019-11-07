@@ -43,7 +43,7 @@ function setupExpress(config, csp) {
       config.corsRoutes &&
       Array.isArray(config.corsRoutes) &&
       config.corsRoutes.length &&
-      config.corsRoutes.find((route) => req.path.startsWith(route))
+      config.corsRoutes.find((route) => req.originalUrl.startsWith(route))
     ) {
       res.header('Access-Control-Allow-Origin', '*');
     } else {
