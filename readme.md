@@ -97,6 +97,7 @@ disableTemplateCache : false
 memoryCacheTtl: 3600 # in seconds => 1 hour,
 variableStart: '{$',    #custom variable start, default: '{{'
 variableEnd: '$}'       #custom variable end, default '}}'
+corsRoutesAsRegExp: false # true when you want to use regular expressions in cors route matching
 corsRoutes: # custom paths that should allow cors from all origins (*)
   - /api
 ```
