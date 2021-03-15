@@ -1,6 +1,6 @@
 {
   "name": "visual-cms.website",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Visual CMS Website Library. By entrecode.",
   "main": "index.js",
   "directories": {
@@ -15,14 +15,14 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "cache-manager": "^2.10.0",
+    "cache-manager": "^3.4.1",
     "compression": "^1.7.4",
     "config": "^3.2.2",
     "cookie-parser": "^1.4.4",
-    "ec.sdk": "^0.21.14",
+    "ec.sdk": "^0.22.7",
     "express": "^4.17.1",
-    "express-promise-router": "^3.0.3",
-    "js-yaml": "^3.13.1",
+    "express-promise-router": "^4.0.1",
+    "js-yaml": "^4.0.0",
     "moment-timezone": "^0.5.26",
     "nunjucks": "^3.2.0",
     "require-all": "^3.0.0",
