@@ -27,6 +27,12 @@ const helper = {
       }
       if (image) {
         if (size) {
+          if (asset.mimetype === 'image/svg+xml') {
+            return asset.file.url;
+          }
+          if (!size || Math.max(asset.file.resolution.width, asset.file.resolution.height) <= size) {
+            return asset.file.url;
+          }
           const f = asset.fileVariants.find((v) => Math.max(v.resolution.width, v.resolution.height) === size);
           if (f) {
             return f.url;
