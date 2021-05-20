@@ -15,37 +15,31 @@ const manifestSymbol = Symbol('manifest-src');
  * A Content Security Policy
  */
 class CSP {
+  // eslint-disable-next-line class-methods-use-this
   get NONE() {
-    return '\'none\'';
+    return "'none'";
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get UNSAFEINLINE() {
-    return '\'unsafe-inline\'';
+    return "'unsafe-inline'";
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get SELF() {
-    return '\'self\'';
+    return "'self'";
   }
 
   constructor() {
     this[defaultSymbol] = [CSP.NONE];
-    this[scriptSymbol] = [
-      CSP.SELF,
-      '*.entrecode.de',
-    ];
+    this[scriptSymbol] = [CSP.SELF, '*.entrecode.de'];
     this[objectSymbol] = [CSP.NONE];
     this[styleSymbol] = [CSP.SELF];
     this[imgSymbol] = ['*'];
     this[mediaSymbol] = ['*'];
     this[childSymbol] = [CSP.NONE];
-    this[fontSymbol] = [
-      CSP.SELF,
-      '*.entrecode.de',
-    ];
-    this[connectSymbol] = [
-      CSP.SELF,
-      '*.entrecode.de',
-    ];
+    this[fontSymbol] = [CSP.SELF, '*.entrecode.de'];
+    this[connectSymbol] = [CSP.SELF, '*.entrecode.de'];
     this[manifestSymbol] = [CSP.SELF];
   }
 
@@ -151,7 +145,7 @@ class CSP {
       'connect-src',
       'manifest-src',
     ]
-      .map(key => `${key} ${this[key].join(' ')}`)
+      .map((key) => `${key} ${this[key].join(' ')}`)
       .join('; ');
 
     res.header('Content-Security-Policy', contentSecurityPolicy);

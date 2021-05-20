@@ -18,7 +18,6 @@ function setupDatamanager(config) {
   } else {
     const Datamanager = require('ec.datamanager');
     datamanager = new Datamanager({ url: config.datamanagerURL });
-
   }
 
   function loadFromDataManagerOrCache(modelName, requestType, ...args) {
@@ -36,7 +35,7 @@ function setupDatamanager(config) {
         .then((entry) =>
           Object.assign({}, SDK ? entry : entry.value, {
             dmCacheHitFrom: 'dmCacheHitFrom' in entry ? entry.dmCacheHitFrom : null,
-          }),
+          })
         );
     }
     if (requestType === 'entries') {
@@ -100,12 +99,12 @@ function setupDatamanager(config) {
           }
           if (SDK) {
             entryList.items = entryList.items.map((entry) =>
-              Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom }),
+              Object.assign(entry, { dmCacheHitFrom: entryList.dmCacheHitFrom })
             );
             return entryList;
           }
           return entryList.entries.map((entry) =>
-            Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom }),
+            Object.assign(entry.value, { dmCacheHitFrom: entryList.dmCacheHitFrom })
           );
         });
     }
@@ -173,7 +172,7 @@ function setupDatamanager(config) {
                 cacheCallback();
               });
           },
-          callback,
+          callback
         );
       })
       .catch(() => callback());
@@ -213,7 +212,7 @@ function setupDatamanager(config) {
                 cacheCallback();
               });
           },
-          callback,
+          callback
         );
       })
       .catch(() => callback());
@@ -253,7 +252,7 @@ function setupDatamanager(config) {
           'entry',
           configObject.entryID,
           configObject.levels,
-          configObject.fields,
+          configObject.fields
         );
       }
       return loadFromDataManagerOrCache(model, 'entries', configObject);
@@ -324,8 +323,8 @@ function setupDatamanager(config) {
         Object.keys(toLoad).map((key) =>
           loadData(toLoad[key]).then((data) => {
             results[key] = data;
-          }),
-        ),
+          })
+        )
       ).then(() => results);
     },
     loadFromDataManagerOrCache,

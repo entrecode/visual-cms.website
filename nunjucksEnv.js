@@ -24,12 +24,12 @@ function setupNunjucksEnv(config, datamanager, options) {
         new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true }),
         new datamanager.TemplateLoader(),
       ],
-      options,
+      options
     );
   } else {
     nunjucksEnv = new nunjucks.Environment(
       [new nunjucks.FileSystemLoader(path.resolve(config.basedir, './views'), { watch: true })],
-      options,
+      options
     );
   }
 
@@ -53,13 +53,13 @@ function setupNunjucksEnv(config, datamanager, options) {
     moment(date)
       .tz(tz || config.timezone)
       .locale(locale || config.locale)
-      .format(format),
+      .format(format)
   );
   nunjucksEnv.addFilter('date_relative', (date, locale, tz) =>
     moment(date)
       .tz(tz || config.timezone)
       .locale(locale || config.locale)
-      .fromNow(),
+      .fromNow()
   );
   nunjucksEnv.addFilter('speakingurl', (input, options = { lang: config.locale }) => speakingurl(input, options));
   nunjucksEnv.addFilter('xss', (input) => xss(input, nunjucksEnv.xss));

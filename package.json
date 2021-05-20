@@ -15,19 +15,19 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "cache-manager": "^3.4.1",
+    "cache-manager": "^3.4.3",
     "compression": "^1.7.4",
     "config": "^3.2.2",
     "cookie-parser": "^1.4.4",
-    "ec.sdk": "^0.22.7",
+    "ec.sdk": "^0.22.10",
     "express": "^4.17.1",
-    "express-promise-router": "^4.0.1",
-    "js-yaml": "^4.0.0",
+    "express-promise-router": "^4.1.0",
+    "js-yaml": "^4.1.0",
     "moment-timezone": "^0.5.26",
     "nunjucks": "^3.2.0",
     "require-all": "^3.0.0",
     "speakingurl": "^14.0.1",
     "visual-cms.core": "^0.2.1",
-    "xss": "^1.0.6"
+    "xss": "^1.0.9"
   }
 }
