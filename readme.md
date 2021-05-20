@@ -54,7 +54,7 @@ specify the file with the above code as "main" in your `package.json`.
 const { config, express, router, csp, datamanager, nunjucksEnv, cache } = require('visual-cms.website')(
   'mywebsite',
   __dirname,
-  false,
+  false
 );
 ```
 

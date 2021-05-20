@@ -13,14 +13,20 @@ module.exports = (projectName, basedir, disableDataManager = false) => {
     return instances.get(projectName);
   }
 
-  const config = 'customers' in configModule && projectName in configModule.customers ? configModule.customers[projectName] : configModule;
+  const config =
+    'customers' in configModule && projectName in configModule.customers
+      ? configModule.customers[projectName]
+      : configModule;
   config.basedir = basedir;
-  const options = config.variableStart && config.variableEnd ? {
-    tags: {
-      variableStart: config.variableStart,
-      variableEnd: config.variableEnd,
-    },
-  } : {};
+  const options =
+    config.variableStart && config.variableEnd
+      ? {
+          tags: {
+            variableStart: config.variableStart,
+            variableEnd: config.variableEnd,
+          },
+        }
+      : {};
   const csp = new CSP();
   const { app, server, errorHandler } = libExpress(config, csp);
   let datamanager;

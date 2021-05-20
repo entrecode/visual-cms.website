@@ -36,7 +36,10 @@ function setupExpress(config, csp) {
   app.use((req, res, next) => csp.middleware(req, res, next));
   app.use((req, res, next) => {
     // some basic security headers
-    res.header('X-Powered-By', `entrecode ${config.friendlyName} v${packageJson.version} (w${process.pid})`);
+    res.header(
+      'X-Powered-By',
+      `entrecode ${config.friendlyName || config.title} v${packageJson.version} (w${process.pid})`
+    );
     res.header('Strict-Transport-Security', 'max-age=31536000');
     res.header('X-Frame-Options', 'DENY');
     res.header('X-XSS-Protection', '1; mode=block');
@@ -47,8 +50,10 @@ function setupExpress(config, csp) {
     if (config.corsRoutes && Array.isArray(config.corsRoutes) && config.corsRoutes.length) {
       if (config.corsRoutesAsRegExp && config.corsRoutes.find((r) => new RegExp(r).test(req.path))) {
         res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', '*');
       } else if (config.corsRoutes.find((route) => req.path.startsWith(route))) {
         res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', '*');
       } else {
         res.header('Access-Control-Allow-Origin', config.publicURL);
       }
