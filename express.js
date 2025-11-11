@@ -18,12 +18,16 @@ const packageJson = require('./package');
 function setupExpress(config, csp) {
   const app = express();
   const server = http.createServer(app);
+
+  server.keepAliveTimeout = 65000; // socket stays open 65s
+  server.headersTimeout = 66000; // a bit longer than keepAliveTimeout
+
   server.listen(config.port, () =>
     console.info(
       `${process.title} ${process.pid} started and listening on port ${server.address().port} (v.${
         packageJson.version
-      })`
-    )
+      })`,
+    ),
   ); // eslint-disable-line
 
   app.set('x-powered-by', false);
@@ -38,7 +42,7 @@ function setupExpress(config, csp) {
     // some basic security headers
     res.header(
       'X-Powered-By',
-      `entrecode ${config.friendlyName || config.title} v${packageJson.version} (w${process.pid})`
+      `entrecode ${config.friendlyName || config.title} v${packageJson.version} (w${process.pid})`,
     );
     res.header('Strict-Transport-Security', 'max-age=31536000');
     res.header('X-Frame-Options', 'DENY');
@@ -95,7 +99,7 @@ function setupExpress(config, csp) {
   app.use(
     express.static(path.resolve(config.basedir, './static'), {
       maxAge: `${365.25 / 12} days`, // 1 month
-    })
+    }),
   );
 
   function errorHandler(err, req, res, next) {
